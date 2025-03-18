@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace Domain.Entities
@@ -10,11 +11,17 @@ namespace Domain.Entities
     public class Rol
     {
         public int Id { get; set; }
-        public string Nombre { get; set; }
-        public string Descripcion { get; set; }
+        [Required]
+        public required string Nombre { get; set; }
+        public string? Descripcion { get; set; }
         public bool Estado { get; set; }
+
         [JsonIgnore]
-        public virtual ICollection<UsuarioWeb> UsuariosWeb { get; set; }
-        public virtual List<RolPermisos>? RolPermisos { get; set; }
+        public ICollection<UsuarioWeb> UsuariosWeb { get; set; } = new List<UsuarioWeb>();
+
+        [JsonIgnore]
+        public ICollection<RolModulos> RolModulos { get; set; } = new List<RolModulos>(); 
+
+        public ICollection<RolPermisos> RolPermisos { get; set; } = new List<RolPermisos>(); 
     }
 }
