@@ -2,12 +2,15 @@
 using Application.Interfaces;
 using Application.Services;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BackendAPI.Controllers.Usuarios;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class UsuarioController : ControllerBase
 {
     private readonly IUsuarioService _userService;
@@ -60,6 +63,18 @@ public class UsuarioController : ControllerBase
 
         await _userService.UpdateWebUserAsync(usuarioWeb);
         return NoContent();
+    }
+
+    // Obtener Menú de Usuario
+    [HttpGet("menu")]
+    public async Task<IActionResult> GetMisModulos()
+    {
+        var email = User.FindFirst(ClaimTypes.Email)?.Value;
+        if (string.IsNullOrEmpty(email))
+            return Unauthorized();
+
+        var modulos = await _userService.GetModulosUsuarioAsync(email);
+        return Ok(modulos);
     }
 
 }

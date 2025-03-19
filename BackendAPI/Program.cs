@@ -59,6 +59,9 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 // Registrar repositorios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
+// Registrar cache
+builder.Services.AddMemoryCache();
+
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<JwtService>();

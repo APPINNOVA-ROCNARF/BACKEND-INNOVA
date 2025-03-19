@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.DTO.MenuDTO;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,8 @@ namespace Application.Interfaces
         Task<UsuarioWeb> GetWebUserByIdAsync(int id);
         Task<UsuarioWeb> CreateWebUserAsync(UsuarioWeb usuarioWeb);
         Task UpdateWebUserAsync(UsuarioWeb usuarioWeb);
+
+        // Obtener Menú de Usuario
+        Task<List<ModuloDTO>> GetModulosUsuarioAsync(string email);
     }
 }
