@@ -1,6 +1,8 @@
 ﻿using Application.DTO;
+using Application.DTO.MenuDTO;
 using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +15,13 @@ namespace Application.Services
     {
         private readonly IUsuarioRepository _userRepository;
 
-        public UsuarioService(IUsuarioRepository userRepository)
+        private readonly IMemoryCache _cache;
+        private readonly TimeSpan _cacheExpiration = TimeSpan.FromMinutes(30);
+
+        public UsuarioService(IUsuarioRepository userRepository, IMemoryCache cache)
         {
             _userRepository = userRepository;
+            _cache = cache;
         }
 
         // Métodos para User
@@ -48,7 +54,7 @@ namespace Application.Services
 
         public async Task<UsuarioWeb> CrearUsuarioWebAsync(NewUsuarioWebDTO usuarioDto)
         {
-            // 1️⃣ Crear Usuario
+            // Crear Usuario
             var nuevoUsuario = new Usuario
             {
                 Nombre = usuarioDto.Nombre,
@@ -58,7 +64,7 @@ namespace Application.Services
 
             nuevoUsuario = await _userRepository.CreateUserAsync(nuevoUsuario);
 
-            // 2️⃣ Crear UsuarioWeb vinculado al Usuario
+            // Crear UsuarioWeb vinculado al Usuario
             var nuevoUsuarioWeb = new UsuarioWeb
             {
                 UsuarioId = nuevoUsuario.Id,
@@ -83,6 +89,28 @@ namespace Application.Services
         public async Task UpdateWebUserAsync(UsuarioWeb usuarioWeb)
         {
             await _userRepository.UpdateWebUserAsync(usuarioWeb);
+        }
+
+        // Obtener Menú de Usuario
+        public async Task<List<ModuloDTO>> GetModulosUsuarioAsync(string email)
+        {
+            // Clave para el cache
+            var cacheKey = $"ModulosUsuario-{email}";
+
+            if(!_cache.TryGetValue(cacheKey, out List<ModuloDTO> modulos))
+            {
+                modulos = await _userRepository.GetModulosUsuarioAsync(email);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = _cacheExpiration
+                };
+
+                // Guardar en cache
+                _cache.Set(cacheKey, modulos, _cacheExpiration);
+            }
+
+            return modulos;
         }
 
     }
