@@ -33,7 +33,7 @@ namespace Infrastructure.Repositories
         public async Task UpdateWebUserAsync(UsuarioWeb usuarioWeb) { _context.UsuariosWeb.Update(usuarioWeb); await _context.SaveChangesAsync(); }
 
         // Obtener Menú de Usuario
-        public async Task<List<ModuloDTO>> GetModulosUsuarioAsync(string email)
+        public async Task<List<ModuloMenuDTO>> GetModulosUsuarioAsync(string email)
         {
             var usuario = await _context.Usuarios
                 .Include(u => u.UsuarioWeb)
@@ -41,20 +41,20 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(u => u.Email == email);
 
             if (usuario == null)
-                return new List<ModuloDTO>();
+                return new List<ModuloMenuDTO>();
 
             var rol = usuario.UsuarioWeb.Rol;
 
             var modulos = await _context.Modulos
                 .Where(m => m.RolModulos.Any(rm => rm.RolId == rol.Id))
-                .Select(m => new ModuloDTO
+                .Select(m => new ModuloMenuDTO
                 {
                     Id = m.Id,
                     Nombre = m.Nombre,
                     Icono = m.Icono,
                     Permisos = m.Permisos
                         .Where(p => p.RolPermisos.Any(rp => rp.RolId == rol.Id))
-                        .Select(p => new PermisoDTO
+                        .Select(p => new PermisoMenuDTO
                         {
                             Id = p.Id,
                             Nombre = p.Nombre,
@@ -63,14 +63,14 @@ namespace Infrastructure.Repositories
                 }).ToListAsync();
 
             // Agregar `Dashboard` para todos los usuarios
-            modulos.Insert(0, new ModuloDTO
+            modulos.Insert(0, new ModuloMenuDTO
             {
                 Id = 0,
                 Nombre = "Dashboard",
                 Icono = "dashboard",
-                Permisos = new List<PermisoDTO>
+                Permisos = new List<PermisoMenuDTO>
                 {
-                    new PermisoDTO
+                    new PermisoMenuDTO
                     {
                         Id = 0, 
                         Nombre = "Welcome",

@@ -92,12 +92,12 @@ namespace Application.Services
         }
 
         // Obtener Menú de Usuario
-        public async Task<List<ModuloDTO>> GetModulosUsuarioAsync(string email)
+        public async Task<List<ModuloMenuDTO>> GetModulosUsuarioAsync(string email)
         {
             // Clave para el cache
             var cacheKey = $"ModulosUsuario-{email}";
 
-            if(!_cache.TryGetValue(cacheKey, out List<ModuloDTO> modulos))
+            if(!_cache.TryGetValue(cacheKey, out List<ModuloMenuDTO> modulos))
             {
                 modulos = await _userRepository.GetModulosUsuarioAsync(email);
 

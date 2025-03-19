@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTO.MenuDTO
 {
-    public class PermisoDTO
+    public class PermisoMenuDTO
     {
         public int Id { get; set; }
         public string Nombre { get; set; }

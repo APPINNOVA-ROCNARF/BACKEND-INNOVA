@@ -55,15 +55,16 @@ builder.Services.AddAuthentication(options =>
 
 // Registrar servicios
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IRolService, RolService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Registrar repositorios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-
+builder.Services.AddScoped<IRolRepository, RolRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 // Registrar cache
 builder.Services.AddMemoryCache();
 
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<JwtService>();
 
 var app = builder.Build();

@@ -25,6 +25,6 @@ namespace Application.Interfaces
         Task UpdateWebUserAsync(UsuarioWeb usuarioWeb);
 
         // Método para obtener el menú de usuario
-        Task<List<ModuloDTO>> GetModulosUsuarioAsync(string email);
+        Task<List<ModuloMenuDTO>> GetModulosUsuarioAsync(string email);
     }
 }
