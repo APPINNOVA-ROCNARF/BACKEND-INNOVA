@@ -19,5 +19,7 @@ namespace Domain.Entities
 
         [JsonIgnore]
         public UsuarioWeb UsuarioWeb { get; set; }
+        [JsonIgnore]
+        public UsuarioApp UsuarioApp { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace BackendAPI.Controllers.Roles
             return Ok(roles);
         }
 
-        [HttpGet("{rolId}/modulos")]
+        [HttpGet("{rolId}")]
         public async Task<IActionResult> GetRolConModulos(int rolId)
         {
             var rol = await _rolService.GetRolConModulosAsync(rolId);
