@@ -34,40 +34,55 @@ namespace Infrastructure.Repositories
 
         public async Task<RolDTO> GetRolConModulosAsync(int rolId)
         {
-            var rol = await _context.Roles
-            .Where(r => r.Id == rolId)
-                .Select(r => new RolDTO
-                {
-                    RolId = r.Id,
-                    NombreRol = r.Nombre,
-                    Descripcion = r.Descripcion,
-                    Estado = r.Estado,
-                    Modulos = _context.Modulos
-                        .Select(m => new ModuloRolDTO
-                        {
-                            ModuloId = m.Id,
-                            NombreModulo = m.Nombre,
-                            Seleccionado = _context.RolModulos.Any(rm => rm.RolId == rolId && rm.ModuloId == m.Id),
-                            Permisos = _context.Permisos
-                                .Where(p => p.ModuloId == m.Id)
-                                .Select(p => new PermisoRolDTO
-                                {
-                                    PermisoId = p.Id,
-                                    NombrePermiso = p.Nombre,
-                                    Seleccionado = _context.RolPermisos.Any(rp => rp.RolId == rolId && rp.PermisoId == p.Id),
-                                    Acciones = _context.Acciones
-                                        .Select(a => new AccionRolDTO
-                                        {
-                                            AccionId = a.Id,
-                                            NombreAccion = a.Nombre,
-                                            Seleccionado = _context.RolPermisos.Any(rp => rp.RolId == rolId && rp.PermisoId == p.Id && rp.AccionId == a.Id)
-                                        }).ToList()
-                                }).ToList()
-                        }).ToList()
-                })
-                .FirstOrDefaultAsync();
+            var rolEntity = await _context.Roles.FirstOrDefaultAsync(r => r.Id == rolId);
+            if (rolEntity == null)
+                return null;
 
-            return rol;
+            // Traer relaciones del rol de una sola vez
+            var rolModulos = await _context.RolModulos
+                .Where(rm => rm.RolId == rolId)
+                .Select(rm => rm.ModuloId)
+                .ToListAsync();
+
+            var rolPermisos = await _context.RolPermisos
+                .Where(rp => rp.RolId == rolId)
+                .ToListAsync();
+
+            var modulos = await _context.Modulos.ToListAsync();
+            var permisos = await _context.Permisos.ToListAsync();
+            var acciones = await _context.Acciones.ToListAsync();
+
+            var rolDto = new RolDTO
+            {
+                RolId = rolEntity.Id,
+                NombreRol = rolEntity.Nombre,
+                Descripcion = rolEntity.Descripcion,
+                Estado = rolEntity.Estado,
+                Modulos = modulos.Select(m => new ModuloRolDTO
+                {
+                    ModuloId = m.Id,
+                    NombreModulo = m.Nombre,
+                    Seleccionado = rolModulos.Contains(m.Id),
+                    Permisos = permisos
+                        .Where(p => p.ModuloId == m.Id)
+                        .Select(p => new PermisoRolDTO
+                        {
+                            PermisoId = p.Id,
+                            NombrePermiso = p.Nombre,
+                            Seleccionado = rolPermisos.Any(rp => rp.PermisoId == p.Id),
+                            Acciones = acciones.Select(a => new AccionRolDTO
+                            {
+                                AccionId = a.Id,
+                                NombreAccion = a.Nombre,
+                                Seleccionado = rolPermisos.Any(rp =>
+                                    rp.PermisoId == p.Id &&
+                                    rp.AccionId == a.Id)
+                            }).ToList()
+                        }).ToList()
+                }).ToList()
+            };
+
+            return rolDto;
         }
     }
 }
