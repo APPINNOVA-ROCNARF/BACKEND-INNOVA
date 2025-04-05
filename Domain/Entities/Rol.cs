@@ -23,8 +23,8 @@ namespace Domain.Entities
         public ICollection<UsuarioApp> UsuariosApp { get; set; }
 
         [JsonIgnore]
-        public ICollection<RolModulos> RolModulos { get; set; } = new List<RolModulos>(); 
+        public ICollection<RolModulos> RolModulos { get; set; } = new List<RolModulos>();
 
-        public ICollection<RolPermisos> RolPermisos { get; set; } = new List<RolPermisos>(); 
+        public ICollection<RolPermisos> RolPermisos { get; set; } = new List<RolPermisos>();
     }
 }

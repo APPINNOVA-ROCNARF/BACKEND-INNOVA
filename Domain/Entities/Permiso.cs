@@ -17,7 +17,7 @@ namespace Domain.Entities
         [Required]
         public required string Ruta { get; set; }
 
-        public int ModuloId { get; set; } 
+        public int ModuloId { get; set; }
 
         public Modulo Modulo { get; set; }
 

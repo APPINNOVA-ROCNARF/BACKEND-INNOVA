@@ -14,11 +14,11 @@ namespace Domain.Entities
         [Required]
         public required string Nombre { get; set; }
 
-        public string? Icono { get; set; } 
+        public string? Icono { get; set; }
 
-        public int? Orden { get; set; } 
+        public int? Orden { get; set; }
 
-        public bool Estado { get; set; } = true; 
+        public bool Estado { get; set; } = true;
 
         public ICollection<RolModulos> RolModulos { get; set; } = new List<RolModulos>();
 

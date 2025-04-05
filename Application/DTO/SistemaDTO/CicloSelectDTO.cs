@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Application.DTO.SistemaDTO
 {
-    public class Plataforma
+    public class CicloSelectDTO
     {
         public int Id { get; set; }
         public string Nombre { get; set; }
-
-        public ICollection<Rol> Roles { get; set; }
     }
 }
