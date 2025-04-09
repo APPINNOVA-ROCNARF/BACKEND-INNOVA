@@ -52,39 +52,11 @@ namespace Application.Services
 
         // Métodos para Usuario Web
 
-        public async Task<UsuarioWeb> CrearUsuarioWebAsync(NewUsuarioWebDTO usuarioDto)
-        {
-            // Crear Usuario
-            var nuevoUsuario = new Usuario
-            {
-                Nombre = usuarioDto.Nombre,
-                Email = usuarioDto.Email,
-                Password = usuarioDto.Password
-            };
-
-            nuevoUsuario = await _userRepository.CreateUserAsync(nuevoUsuario);
-
-            // Crear UsuarioWeb vinculado al Usuario
-            var nuevoUsuarioWeb = new UsuarioWeb
-            {
-                UsuarioId = nuevoUsuario.Id,
-                RolId = usuarioDto.RolId
-            };
-
-            nuevoUsuarioWeb = await _userRepository.CreateWebUserAsync(nuevoUsuarioWeb);
-
-            return nuevoUsuarioWeb;
-        }
-
         public async Task<UsuarioWeb> GetWebUserByIdAsync(int id)
         {
             return await _userRepository.GetWebUserByIdAsync(id);
         }
 
-        public async Task<UsuarioWeb> CreateWebUserAsync(UsuarioWeb usuarioWeb)
-        {
-            return await _userRepository.CreateWebUserAsync(usuarioWeb);
-        }
 
         public async Task UpdateWebUserAsync(UsuarioWeb usuarioWeb)
         {

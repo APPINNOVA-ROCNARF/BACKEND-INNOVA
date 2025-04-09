@@ -23,9 +23,9 @@ namespace Infrastructure.Repositories
         public async Task<Usuario> GetUsuarioByEmail(string email)
         {
             return await _context.Usuarios
-                .Include(u => u.UsuarioWeb)
-                    .ThenInclude(uw => uw.Rol)
+                .Include(u => u.Rol)
                 .FirstOrDefaultAsync(u => u.Email == email);
+
         }
     }
 }

@@ -26,6 +26,18 @@ namespace Application.Services
         {
             return await _rolRepository.GetRolConModulosAsync(rolId);
         }
+
+        public async Task<List<ModuloRolDTO>> GetModulosAsync()
+        {
+            return await _rolRepository.GetModulosAsync();
+        }
+
+        public async Task CrearRolAsync(CrearRolRequestDTO dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.NombreRol))
+                throw new ArgumentException("El nombre del rol no puede estar vacío.");
+            await _rolRepository.CrearRolAsync(dto);
+        }
     }
 }
 

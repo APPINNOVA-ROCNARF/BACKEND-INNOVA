@@ -11,5 +11,7 @@ namespace Application.Interfaces
     {
         Task<List<RolSimpleDTO>> GetRolesAsync();
         Task<RolDTO> GetRolConModulosAsync(int rolId);
+        Task<List<ModuloRolDTO>> GetModulosAsync();
+        Task CrearRolAsync(CrearRolRequestDTO dto);
     }
 }

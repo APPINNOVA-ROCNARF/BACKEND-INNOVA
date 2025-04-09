@@ -19,9 +19,7 @@ namespace Application.Interfaces
         Task DeleteUserAsync(int id);
 
         // Métodos para Usuarios Web
-        Task<UsuarioWeb> CrearUsuarioWebAsync(NewUsuarioWebDTO usuarioDTO);
         Task<UsuarioWeb> GetWebUserByIdAsync(int id);
-        Task<UsuarioWeb> CreateWebUserAsync(UsuarioWeb usuarioWeb);
         Task UpdateWebUserAsync(UsuarioWeb usuarioWeb);
 
         // Método para obtener el menú de usuario

@@ -17,6 +17,9 @@ namespace Domain.Entities
         public DateTime CreadoEn { get; set; } = DateTime.UtcNow;
         public DateTime ModificadoEn { get; set; } = DateTime.UtcNow;
 
+        public int RolId { get; set; }
+        public Rol Rol { get; set; }
+
         [JsonIgnore]
         public UsuarioWeb UsuarioWeb { get; set; }
         [JsonIgnore]

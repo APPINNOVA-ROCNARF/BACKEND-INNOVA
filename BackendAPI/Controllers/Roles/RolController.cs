@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.DTO.RolDTO;
+using Application.Interfaces;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,6 @@ namespace BackendAPI.Controllers.Roles
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class RolController : ControllerBase
     {
         private readonly IRolService _rolService;
@@ -32,6 +32,27 @@ namespace BackendAPI.Controllers.Roles
                 return NotFound($"No se encontró el rol con ID {rolId}");
 
             return Ok(rol);
+        }
+
+        [HttpGet("modulos")]
+        public async Task<IActionResult> GetModulos()
+        {
+            var modulos = await _rolService.GetModulosAsync();
+            return Ok(modulos);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CrearRol([FromBody] CrearRolRequestDTO dto)
+        {
+            try
+            {
+                await _rolService.CrearRolAsync(dto);
+                return Ok(new { mensaje = "Rol creado correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Ocurrió un error al crear el rol", detalle = ex.Message });
+            }
         }
     }
 }

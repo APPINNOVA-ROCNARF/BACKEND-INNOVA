@@ -16,8 +16,6 @@ namespace Infrastructure.Data
         public DbSet<UsuarioWeb> UsuariosWeb { get; set; }
         public DbSet<UsuarioApp> UsuariosApp { get; set; }
         public DbSet<Rol> Roles { get; set; }
-        public DbSet<Plataforma> Plataformas { get; set; }
-
         public DbSet<Modulo> Modulos { get; set; }
         public DbSet<RolModulos> RolModulos { get; set; }
         public DbSet<Permiso> Permisos { get; set; }
@@ -27,6 +25,29 @@ namespace Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            // Usuarios
+            modelBuilder.Entity<Usuario>()
+                .Property(u => u.Estado)
+                .HasDefaultValue(true);
+            
+            modelBuilder.Entity<Usuario>()
+                .Property(u => u.CreadoEn)
+                .HasDefaultValueSql("NOW()")
+                .HasColumnType("timestamp without time zone");
+
+            modelBuilder.Entity<Usuario>()
+                .Property(u => u.ModificadoEn)
+                .HasDefaultValueSql("NOW()")
+                .HasColumnType("timestamp without time zone");
+
+            modelBuilder.Entity<Usuario>()
+                .HasOne(u => u.Rol)
+                .WithMany(r => r.Usuarios)
+                .HasForeignKey(u => u.RolId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             // Relación UsuarioWeb ↔ Usuario
             modelBuilder.Entity<UsuarioWeb>()
                 .HasKey(wu => wu.Id);
@@ -36,12 +57,6 @@ namespace Infrastructure.Data
                 .WithOne(u => u.UsuarioWeb)
                 .HasForeignKey<UsuarioWeb>(uw => uw.UsuarioId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // Relación UsuarioWeb ↔ Rol
-            modelBuilder.Entity<UsuarioWeb>()
-                .HasOne(uw => uw.Rol)
-                .WithMany(r => r.UsuariosWeb)
-                .HasForeignKey(uw => uw.RolId);
 
             // Relación UsuarioMovil ↔ Usuario
             modelBuilder.Entity<UsuarioApp>()
@@ -53,13 +68,6 @@ namespace Infrastructure.Data
                 .HasForeignKey<UsuarioApp>(um => um.UsuarioId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Relación UsuarioMovil ↔ Rol
-            modelBuilder.Entity<UsuarioApp>()
-                .HasOne(um => um.Rol)
-                .WithMany(r => r.UsuariosApp)
-                .HasForeignKey(um => um.RolId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // Username único y obligatorio
             modelBuilder.Entity<UsuarioApp>()
                 .HasIndex(um => um.NombreUsuario)
@@ -70,27 +78,15 @@ namespace Infrastructure.Data
                 .HasMaxLength(5)
                 .IsRequired();
 
-            // Relación Rol ↔ Plataforma
-            modelBuilder.Entity<Plataforma>()
-                .HasKey(p => p.Id);
-
-            modelBuilder.Entity<Plataforma>()
-                .Property(p => p.Nombre)
-                .HasMaxLength(10)
-                .IsRequired();
-
+            // Roles
             modelBuilder.Entity<Rol>()
-                .HasOne(r => r.Plataforma)
-                .WithMany(p => p.Roles)
-                .HasForeignKey(r => r.PlataformaId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .Property(r => r.Estado)
+                .HasDefaultValue(true);
 
-            modelBuilder.Entity<Plataforma>().HasData(
-                new Plataforma { Id = 1, Nombre = "WEB" },
-                new Plataforma { Id = 2, Nombre = "APP" },
-                new Plataforma { Id = 3, Nombre = "MULTI" }
-);
-
+            //Modulos
+            modelBuilder.Entity<Modulo>()
+                .Property(m => m.Estado)
+                .HasDefaultValue(true);
 
             // Relación Rol ↔ Modulo (Muchos a Muchos con tabla intermedia `RolModulos`)
             modelBuilder.Entity<RolModulos>()

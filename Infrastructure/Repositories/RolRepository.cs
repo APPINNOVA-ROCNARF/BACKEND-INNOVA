@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.DTO.RolDTO;
+﻿using Application.DTO.RolDTO;
 using Application.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -84,6 +79,89 @@ namespace Infrastructure.Repositories
 
             return rolDto;
         }
+
+        public async Task<List<ModuloRolDTO>> GetModulosAsync()
+        {
+            var modulos = await _context.Modulos.ToListAsync();
+            var permisos = await _context.Permisos.ToListAsync();
+            var acciones = await _context.Acciones.ToListAsync();
+
+            var modulosDto = modulos.Select(m => new ModuloRolDTO
+            {
+                ModuloId = m.Id,
+                NombreModulo = m.Nombre,
+                Seleccionado = false,
+                Permisos = permisos
+                    .Where(p => p.ModuloId == m.Id)
+                    .Select(p => new PermisoRolDTO
+                    {
+                        PermisoId = p.Id,
+                        NombrePermiso = p.Nombre,
+                        Seleccionado = false,
+                        Acciones = acciones.Select(a => new AccionRolDTO
+                        {
+                            AccionId = a.Id,
+                            NombreAccion = a.Nombre,
+                            Seleccionado = false
+                        }).ToList()
+                    }).ToList()
+            }).ToList();
+
+            return modulosDto;
+        }
+
+    
+
+    public async Task CrearRolAsync(CrearRolRequestDTO dto)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var nuevoRol = new Domain.Entities.Rol
+                {
+                    Nombre = dto.NombreRol,
+                    Descripcion = dto.Descripcion,
+                    Estado = true
+                };
+
+                _context.Roles.Add(nuevoRol);
+                await _context.SaveChangesAsync();
+
+                foreach (var moduloDto in dto.Modulos.Where(m => m.Seleccionado))
+                {
+                    var rolModulo = new Domain.Entities.RolModulos
+                    {
+                        RolId = nuevoRol.Id,
+                        ModuloId = moduloDto.ModuloId
+                    };
+                    _context.RolModulos.Add(rolModulo);
+
+                    foreach (var permisoDto in moduloDto.Permisos.Where(p => p.Seleccionado))
+                    {
+                        foreach (var accionDto in permisoDto.Acciones.Where(a => a.Seleccionado))
+                        {
+                            var rolPermiso = new Domain.Entities.RolPermisos
+                            {
+                                RolId = nuevoRol.Id,
+                                PermisoId = permisoDto.PermisoId,
+                                AccionId = accionDto.AccionId
+                            };
+                            _context.RolPermisos.Add(rolPermiso);
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
     }
 }
 

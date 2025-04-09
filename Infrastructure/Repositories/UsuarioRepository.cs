@@ -36,31 +36,29 @@ namespace Infrastructure.Repositories
         public async Task<List<ModuloMenuDTO>> GetModulosUsuarioAsync(string email)
         {
             var usuario = await _context.Usuarios
-                .Include(u => u.UsuarioWeb)
-                    .ThenInclude(uw => uw.Rol)
                 .FirstOrDefaultAsync(u => u.Email == email);
 
             if (usuario == null)
                 return new List<ModuloMenuDTO>();
 
-            var rol = usuario.UsuarioWeb.Rol;
+            var rolId = usuario.RolId;
 
             var modulos = await _context.Modulos
-                .Where(m => m.RolModulos.Any(rm => rm.RolId == rol.Id))
-                .Select(m => new ModuloMenuDTO
-                {
-                    Id = m.Id,
-                    Nombre = m.Nombre,
-                    Icono = m.Icono,
-                    Permisos = m.Permisos
-                        .Where(p => p.RolPermisos.Any(rp => rp.RolId == rol.Id))
-                        .Select(p => new PermisoMenuDTO
-                        {
-                            Id = p.Id,
-                            Nombre = p.Nombre,
-                            Ruta = p.Ruta
-                        }).ToList()
-                }).ToListAsync();
+                    .Where(m => m.RolModulos.Any(rm => rm.RolId == rolId))
+                    .Select(m => new ModuloMenuDTO
+                    {
+                        Id = m.Id,
+                        Nombre = m.Nombre,
+                        Icono = m.Icono,
+                        Permisos = m.Permisos
+                            .Where(p => p.RolPermisos.Any(rp => rp.RolId == rolId))
+                            .Select(p => new PermisoMenuDTO
+                            {
+                                Id = p.Id,
+                                Nombre = p.Nombre,
+                                Ruta = p.Ruta
+                            }).ToList()
+                    }).ToListAsync();
 
             // Agregar `Dashboard` para todos los usuarios
             modulos.Insert(0, new ModuloMenuDTO
