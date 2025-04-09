@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250405033902_RemovePlataforma")]
+    partial class RemovePlataforma
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,9 +86,7 @@ namespace Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Estado")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Icono")
                         .HasColumnType("text");
@@ -140,9 +141,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("Estado")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -197,23 +196,17 @@ namespace Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreadoEn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("Estado")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("ModificadoEn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -223,12 +216,7 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("RolId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("RolId");
 
                     b.ToTable("Usuarios");
                 });
@@ -246,6 +234,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(5)
                         .HasColumnType("character varying(5)");
 
+                    b.Property<int>("RolId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("UsuarioId")
                         .HasColumnType("integer");
 
@@ -253,6 +244,8 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("NombreUsuario")
                         .IsUnique();
+
+                    b.HasIndex("RolId");
 
                     b.HasIndex("UsuarioId")
                         .IsUnique();
@@ -268,10 +261,15 @@ namespace Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("RolId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("UsuarioId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RolId");
 
                     b.HasIndex("UsuarioId")
                         .IsUnique();
@@ -336,35 +334,40 @@ namespace Infrastructure.Migrations
                     b.Navigation("Rol");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Usuario", b =>
+            modelBuilder.Entity("Domain.Entities.UsuarioApp", b =>
                 {
                     b.HasOne("Domain.Entities.Rol", "Rol")
-                        .WithMany("Usuarios")
+                        .WithMany("UsuariosApp")
                         .HasForeignKey("RolId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Rol");
-                });
-
-            modelBuilder.Entity("Domain.Entities.UsuarioApp", b =>
-                {
                     b.HasOne("Domain.Entities.Usuario", "Usuario")
                         .WithOne("UsuarioApp")
                         .HasForeignKey("Domain.Entities.UsuarioApp", "UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Rol");
+
                     b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Domain.Entities.UsuarioWeb", b =>
                 {
+                    b.HasOne("Domain.Entities.Rol", "Rol")
+                        .WithMany("UsuariosWeb")
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.Usuario", "Usuario")
                         .WithOne("UsuarioWeb")
                         .HasForeignKey("Domain.Entities.UsuarioWeb", "UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Rol");
 
                     b.Navigation("Usuario");
                 });
@@ -387,7 +390,9 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("RolPermisos");
 
-                    b.Navigation("Usuarios");
+                    b.Navigation("UsuariosApp");
+
+                    b.Navigation("UsuariosWeb");
                 });
 
             modelBuilder.Entity("Domain.Entities.Usuario", b =>

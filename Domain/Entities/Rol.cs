@@ -15,13 +15,9 @@ namespace Domain.Entities
         public required string Nombre { get; set; }
         public string? Descripcion { get; set; }
         public bool Estado { get; set; }
-        public int? PlataformaId { get; set; }
-        public Plataforma Plataforma { get; set; }
 
         [JsonIgnore]
-        public ICollection<UsuarioWeb> UsuariosWeb { get; set; } = new List<UsuarioWeb>();
-        public ICollection<UsuarioApp> UsuariosApp { get; set; }
-
+        public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
         [JsonIgnore]
         public ICollection<RolModulos> RolModulos { get; set; } = new List<RolModulos>();
 

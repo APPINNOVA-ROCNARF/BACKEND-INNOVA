@@ -22,7 +22,7 @@ namespace Application.Services
                 return null;
             }
 
-            string role = usuario.UsuarioWeb?.Rol?.Nombre ?? "UsuarioApp";
+            string role = usuario.Rol.Nombre;
 
             return _jwtService.GenerateToken(usuario.Id, usuario.Email, role);
 

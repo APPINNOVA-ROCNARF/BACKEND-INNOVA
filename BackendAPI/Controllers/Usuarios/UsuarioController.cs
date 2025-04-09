@@ -46,16 +46,6 @@ public class UsuarioController : ControllerBase
         return NoContent();
     }
 
-
-    // Crear WebUser
-    [HttpPost("usuarioweb")]
-    public async Task<ActionResult<UsuarioWeb>> CrearUsuarioWeb([FromBody] NewUsuarioWebDTO usuarioDto)
-    {
-        var usuarioWeb = await _userService.CrearUsuarioWebAsync(usuarioDto);
-        return CreatedAtAction(nameof(CrearUsuarioWeb), new { id = usuarioWeb.Id }, usuarioWeb);
-    }
-
-    // Actualizar WebUser
     [HttpPut("usuarioweb/{id}")]
     public async Task<IActionResult> UpdateWebUser(int id, [FromBody] UsuarioWeb usuarioWeb)
     {
