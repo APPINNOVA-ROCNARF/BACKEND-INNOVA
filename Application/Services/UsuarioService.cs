@@ -1,7 +1,8 @@
 ﻿using Application.DTO;
 using Application.DTO.MenuDTO;
-using Application.Interfaces;
-using Domain.Entities;
+using Application.DTO.UsuarioDTO;
+using Application.Interfaces.IUsuario;
+using Domain.Entities.Usuarios;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -61,6 +62,12 @@ namespace Application.Services
         public async Task UpdateWebUserAsync(UsuarioWeb usuarioWeb)
         {
             await _userRepository.UpdateWebUserAsync(usuarioWeb);
+        }
+
+        // Métodos para Usuario App
+        public async Task<List<UsuarioAppSelectDTO>> ObtenerUsuariosAppSelectDTOAsync()
+        {
+            return await _userRepository.ObtenerUsuariosAppSelectDTOAsync();
         }
 
         // Obtener Menú de Usuario

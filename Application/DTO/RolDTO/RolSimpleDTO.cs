@@ -11,6 +11,7 @@ namespace Application.DTO.RolDTO
         public int RolId { get; set; }
         public string NombreRol { get; set; }
         public string Descripcion { get; set; }
+        public string Tipo { get; set; }
         public bool Estado { get; set; }
     }
 }

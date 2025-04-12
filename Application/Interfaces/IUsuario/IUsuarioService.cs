@@ -1,14 +1,16 @@
-﻿using Application.DTO.MenuDTO;
-using Domain.Entities;
+﻿using Application.DTO;
+using Application.DTO.MenuDTO;
+using Application.DTO.UsuarioDTO;
+using Domain.Entities.Usuarios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces
+namespace Application.Interfaces.IUsuario
 {
-    public interface IUsuarioRepository
+    public interface IUsuarioService
     {
         // Métodos para Usuarios
         Task<IEnumerable<Usuario>> GetAllUsersAsync();
@@ -19,10 +21,11 @@ namespace Application.Interfaces
 
         // Métodos para Usuarios Web
         Task<UsuarioWeb> GetWebUserByIdAsync(int id);
-        Task<UsuarioWeb> CreateWebUserAsync(UsuarioWeb usuarioWeb);
         Task UpdateWebUserAsync(UsuarioWeb usuarioWeb);
 
-        // Obtener Menú de Usuario
+        // Métodos para Usuarios App
+        Task<List<UsuarioAppSelectDTO>> ObtenerUsuariosAppSelectDTOAsync();
+        // Método para obtener el menú de usuario
         Task<List<ModuloMenuDTO>> GetModulosUsuarioAsync(string email);
     }
 }

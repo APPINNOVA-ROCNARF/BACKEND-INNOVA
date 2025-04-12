@@ -1,5 +1,5 @@
 ﻿using Application.DTO.RolDTO;
-using Application.Interfaces;
+using Application.Interfaces.IRol;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +22,7 @@ namespace Infrastructure.Repositories
                     RolId = r.Id,
                     NombreRol = r.Nombre,
                     Descripcion = r.Descripcion,
+                    Tipo = r.Tipo.ToString(),
                     Estado = r.Estado
                 })
                 .ToListAsync();
@@ -118,7 +119,7 @@ namespace Infrastructure.Repositories
 
             try
             {
-                var nuevoRol = new Domain.Entities.Rol
+                var nuevoRol = new Domain.Entities.Usuarios.Rol
                 {
                     Nombre = dto.NombreRol,
                     Descripcion = dto.Descripcion,
@@ -130,7 +131,7 @@ namespace Infrastructure.Repositories
 
                 foreach (var moduloDto in dto.Modulos.Where(m => m.Seleccionado))
                 {
-                    var rolModulo = new Domain.Entities.RolModulos
+                    var rolModulo = new Domain.Entities.Usuarios.RolModulos
                     {
                         RolId = nuevoRol.Id,
                         ModuloId = moduloDto.ModuloId
@@ -141,7 +142,7 @@ namespace Infrastructure.Repositories
                     {
                         foreach (var accionDto in permisoDto.Acciones.Where(a => a.Seleccionado))
                         {
-                            var rolPermiso = new Domain.Entities.RolPermisos
+                            var rolPermiso = new Domain.Entities.Usuarios.RolPermisos
                             {
                                 RolId = nuevoRol.Id,
                                 PermisoId = permisoDto.PermisoId,

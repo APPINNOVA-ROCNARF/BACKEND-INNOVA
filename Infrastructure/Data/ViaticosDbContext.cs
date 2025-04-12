@@ -13,9 +13,9 @@ namespace Infrastructure.Data
         public ViaticosDbContext(DbContextOptions<ViaticosDbContext> options) : base(options) { }
 
         public DbSet<Viatico> Viaticos { get; set; }
-        public DbSet<Categoria> Categorias { get; set; }
-        public DbSet<Factura> Facturas { get; set; }
-        public DbSet<Proveedor> Proveedores { get; set; }
+        public DbSet<CategoriaViatico> CategoriasViatico { get; set; }
+        public DbSet<FacturaViatico> FacturasViatico { get; set; }
+        public DbSet<ProveedorViatico> ProveedoresViatico { get; set; }
         public DbSet<Vehiculo> Vehiculos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -64,20 +64,20 @@ namespace Infrastructure.Data
             });
 
             // CATEGORIA
-            modelBuilder.Entity<Categoria>(entity =>
+            modelBuilder.Entity<CategoriaViatico>(entity =>
             {
                 entity.HasKey(c => c.Id);
                 entity.Property(c => c.Nombre).HasMaxLength(50).IsRequired();
                 entity.Property(c => c.Estado).IsRequired();
                 entity.HasData(
-                    new Categoria { Id = 1, Nombre = "movilizacion", Estado = true },
-                    new Categoria { Id = 2, Nombre = "alimentacion", Estado = true },
-                    new Categoria { Id = 3, Nombre = "hospedaje", Estado = true }
+                    new CategoriaViatico { Id = 1, Nombre = "Movilización", Estado = true },
+                    new CategoriaViatico { Id = 2, Nombre = "Alimentación", Estado = true },
+                    new CategoriaViatico { Id = 3, Nombre = "Hospedaje", Estado = true }
                  );
             });
 
             // PROVEEDOR
-            modelBuilder.Entity<Proveedor>(entity =>
+            modelBuilder.Entity<ProveedorViatico>(entity =>
             {
                 entity.HasKey(p => p.Ruc);
                 entity.Property(p => p.Ruc).HasMaxLength(20).IsRequired();
@@ -85,7 +85,7 @@ namespace Infrastructure.Data
             });
 
             // FACTURA
-            modelBuilder.Entity<Factura>(entity =>
+            modelBuilder.Entity<FacturaViatico>(entity =>
             {
                 entity.HasKey(f => f.Id);
 

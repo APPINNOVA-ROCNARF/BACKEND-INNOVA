@@ -1,5 +1,5 @@
 ﻿using Application.DTO.RolDTO;
-using Application.Interfaces;
+using Application.Interfaces.IRol;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

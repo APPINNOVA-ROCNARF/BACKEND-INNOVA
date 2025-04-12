@@ -1,4 +1,4 @@
-﻿using Application.Interfaces;
+﻿using Application.Interfaces.ISistema;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +15,7 @@ namespace BackendAPI.Controllers.Sistema
             _service = service;
         }
 
-        [HttpGet("periodos/select")]
+        [HttpGet("ciclos/select")]
         public async Task<IActionResult> GetCiclosSelect()
         {
             var ciclos = await _service.ObtenerCiclosSelectAsync();

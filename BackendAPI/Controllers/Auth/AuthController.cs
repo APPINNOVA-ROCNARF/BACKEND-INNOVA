@@ -1,10 +1,11 @@
-﻿using Application.Interfaces;
+﻿using Application.Interfaces.IAuth;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Application.DTO;
 
 namespace BackendAPI.Controllers.Auth;
 
-    [Route("api/auth")]
+[Route("api/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -16,7 +17,7 @@ namespace BackendAPI.Controllers.Auth;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
         {
             var token = await _authService.AuthenticateUser(request.Email, request.Password);
             if (token == null)

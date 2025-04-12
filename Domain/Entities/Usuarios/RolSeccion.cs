@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Domain.Entities.Usuarios
 {
-    public class RolModulos
+    public class RolSeccion
     {
         public int RolId { get; set; }
-        public int ModuloId { get; set; }
         public Rol Rol { get; set; }
-        public Modulo Modulo { get; set; }
+
+        public int SeccionId { get; set; }
     }
 }

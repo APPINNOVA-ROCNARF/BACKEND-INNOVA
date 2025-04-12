@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.DTO.SistemaDTO;
 
-namespace Application.Interfaces
+namespace Application.Interfaces.ISistema
 {
-    public interface ISistemaService
+    public interface ISistemaRepository
     {
         Task<List<CicloSelectDTO>> ObtenerCiclosSelectAsync();
     }

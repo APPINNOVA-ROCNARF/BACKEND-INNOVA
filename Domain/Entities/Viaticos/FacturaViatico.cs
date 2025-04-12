@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Viaticos
 {
-    public class Factura
+    public class FacturaViatico
     {
         public int Id { get; set; }             
         public string NumeroFactura { get; set; } = string.Empty;
         public DateTime FechaFactura { get; set; }
 
         public string RucProveedor { get; set; } = string.Empty;   
-        public Proveedor? Proveedor { get; set; }
+        public ProveedorViatico? Proveedor { get; set; }
 
         public decimal Subtotal { get; set; }
         public decimal SubtotalIva { get; set; }

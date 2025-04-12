@@ -1,6 +1,7 @@
 ﻿using Application.DTO.MenuDTO;
-using Application.Interfaces;
-using Domain.Entities;
+using Application.DTO.UsuarioDTO;
+using Application.Interfaces.IUsuario;
+using Domain.Entities.Usuarios;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -31,6 +32,21 @@ namespace Infrastructure.Repositories
         public async Task<UsuarioWeb> GetWebUserByIdAsync(int id) => await _context.UsuariosWeb.FindAsync(id);
         public async Task<UsuarioWeb> CreateWebUserAsync(UsuarioWeb usuarioWeb) { _context.UsuariosWeb.Add(usuarioWeb); await _context.SaveChangesAsync(); return usuarioWeb; }
         public async Task UpdateWebUserAsync(UsuarioWeb usuarioWeb) { _context.UsuariosWeb.Update(usuarioWeb); await _context.SaveChangesAsync(); }
+
+        // Métodos para Usuarios App
+        public async Task<List<UsuarioAppSelectDTO>> ObtenerUsuariosAppSelectDTOAsync()
+        {
+            return await _context.UsuariosApp
+                .Where(ua => ua.Usuario.Estado)
+                .Include(ua => ua.Usuario)
+                .Select(ua => new UsuarioAppSelectDTO
+                {
+                    Id = ua.Id,
+                    Nombre = ua.Usuario.Nombre
+                })
+                .AsNoTracking()
+                .ToListAsync();
+        }
 
         // Obtener Menú de Usuario
         public async Task<List<ModuloMenuDTO>> GetModulosUsuarioAsync(string email)

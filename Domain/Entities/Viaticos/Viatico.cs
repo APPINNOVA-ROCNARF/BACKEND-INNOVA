@@ -17,10 +17,10 @@ namespace Domain.Entities.Viaticos
         public int CicloId { get; set; }
 
         public int CategoriaId { get; set; }
-        public Categoria? Categoria { get; set; }
+        public CategoriaViatico? Categoria { get; set; }
 
         public int? FacturaId { get; set; }
-        public Factura? Factura { get; set; }
+        public FacturaViatico? Factura { get; set; }
 
         public string? PlacaVehiculo { get; set; }
         public Vehiculo? Vehiculo { get; set; }

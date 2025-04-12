@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Domain.Entities.Usuarios
 {
     public class Usuario
     {

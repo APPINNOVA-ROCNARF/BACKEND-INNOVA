@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Entities.Usuarios;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace Infrastructure.Data
         public DbSet<Rol> Roles { get; set; }
         public DbSet<Modulo> Modulos { get; set; }
         public DbSet<RolModulos> RolModulos { get; set; }
+        public DbSet<RolSeccion> RolSecciones { get; set; }
         public DbSet<Permiso> Permisos { get; set; }
         public DbSet<Accion> Acciones { get; set; }
         public DbSet<RolPermisos> RolPermisos { get; set; }
@@ -78,10 +80,37 @@ namespace Infrastructure.Data
                 .HasMaxLength(5)
                 .IsRequired();
 
+            modelBuilder.Entity<UsuarioAppSeccion>(entity =>
+            {
+                entity.HasKey(us => new { us.UsuarioAppId, us.SeccionId });
+
+                entity.HasOne(us => us.UsuarioApp)
+                      .WithMany(ua => ua.UsuarioSecciones)
+                      .HasForeignKey(us => us.UsuarioAppId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+            });
+
             // Roles
             modelBuilder.Entity<Rol>()
                 .Property(r => r.Estado)
                 .HasDefaultValue(true);
+
+            modelBuilder.Entity<RolSeccion>(entity =>
+            {
+                entity.HasKey(rs => new { rs.RolId, rs.SeccionId });
+
+                entity.HasOne(rs => rs.Rol)
+                      .WithMany(r => r.RolSecciones)
+                      .HasForeignKey(rs => rs.RolId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+            });
+
+            modelBuilder.Entity<Rol>()
+                .Property(r => r.Tipo)
+                .HasConversion<int>(); 
+
 
             //Modulos
             modelBuilder.Entity<Modulo>()

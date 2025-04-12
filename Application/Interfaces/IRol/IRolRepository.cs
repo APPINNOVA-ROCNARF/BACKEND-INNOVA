@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.DTO.RolDTO;
 
-namespace Application.Interfaces
+namespace Application.Interfaces.IRol
 {
     public interface IRolRepository
     {

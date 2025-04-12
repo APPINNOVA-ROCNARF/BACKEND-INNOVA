@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Application.Interfaces;
-using Domain.Entities;
+using Application.Interfaces.IAuth;
+using Domain.Entities.Usuarios;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

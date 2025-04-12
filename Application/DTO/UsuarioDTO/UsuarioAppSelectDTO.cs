@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Application.DTO.UsuarioDTO
 {
-    public class Accion
+    public class UsuarioAppSelectDTO
     {
         public int Id { get; set; }
         public string Nombre { get; set; }

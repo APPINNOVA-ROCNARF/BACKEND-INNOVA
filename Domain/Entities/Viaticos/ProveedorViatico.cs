@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Viaticos
 {
-    public class Proveedor
+    public class ProveedorViatico
     {
         public string Ruc { get; set; } = string.Empty;      
         public string RazonSocial { get; set; } = string.Empty;
 
-        public ICollection<Factura>? Facturas { get; set; }  
+        public ICollection<FacturaViatico>? Facturas { get; set; }  
     }
 }

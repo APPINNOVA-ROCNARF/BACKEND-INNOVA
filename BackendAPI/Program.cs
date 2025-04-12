@@ -1,4 +1,7 @@
-using Application.Interfaces;
+using Application.Interfaces.IAuth;
+using Application.Interfaces.IRol;
+using Application.Interfaces.ISistema;
+using Application.Interfaces.IUsuario;
 using Application.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;

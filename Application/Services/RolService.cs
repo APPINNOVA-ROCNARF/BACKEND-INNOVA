@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.DTO.RolDTO;
-using Application.Interfaces;
+using Application.Interfaces.IRol;
 
 namespace Application.Services
 {

@@ -1,7 +1,8 @@
 ﻿using Application.DTO;
-using Application.Interfaces;
+using Application.DTO.UsuarioDTO;
+using Application.Interfaces.IUsuario;
 using Application.Services;
-using Domain.Entities;
+using Domain.Entities.Usuarios;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -10,7 +11,6 @@ namespace BackendAPI.Controllers.Usuarios;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class UsuarioController : ControllerBase
 {
     private readonly IUsuarioService _userService;
@@ -53,6 +53,14 @@ public class UsuarioController : ControllerBase
 
         await _userService.UpdateWebUserAsync(usuarioWeb);
         return NoContent();
+    }
+
+    // Obtener Select de Usuarios App
+    [HttpGet("usuariosapp/select")]
+    public async Task<ActionResult<List<UsuarioAppSelectDTO>>> ObtenerUsuariosSelect()
+    {
+        var usuarios = await _userService.ObtenerUsuariosAppSelectDTOAsync();
+        return Ok(usuarios);
     }
 
     // Obtener Menú de Usuario

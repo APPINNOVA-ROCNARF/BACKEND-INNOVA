@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Viaticos
 {
-    public class Categoria
+    public class CategoriaViatico
     {
         public int Id { get; set; }                   
         public string Nombre { get; set; } = string.Empty;

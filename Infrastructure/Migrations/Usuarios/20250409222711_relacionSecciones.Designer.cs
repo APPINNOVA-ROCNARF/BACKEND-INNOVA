@@ -3,17 +3,20 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace Infrastructure.Migrations.Usuarios
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250409222711_relacionSecciones")]
+    partial class relacionSecciones
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,9 +151,6 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Tipo")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
@@ -189,19 +189,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PermisoId");
 
                     b.ToTable("RolPermisos");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Usuarios.RolSeccion", b =>
-                {
-                    b.Property<int>("RolId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("SeccionId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("RolId", "SeccionId");
-
-                    b.ToTable("RolSecciones");
                 });
 
             modelBuilder.Entity("Domain.Entities.Usuarios.Usuario", b =>
@@ -365,17 +352,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Rol");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Usuarios.RolSeccion", b =>
-                {
-                    b.HasOne("Domain.Entities.Usuarios.Rol", "Rol")
-                        .WithMany("RolSecciones")
-                        .HasForeignKey("RolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rol");
-                });
-
             modelBuilder.Entity("Domain.Entities.Usuarios.Usuario", b =>
                 {
                     b.HasOne("Domain.Entities.Usuarios.Rol", "Rol")
@@ -437,8 +413,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("RolModulos");
 
                     b.Navigation("RolPermisos");
-
-                    b.Navigation("RolSecciones");
 
                     b.Navigation("Usuarios");
                 });

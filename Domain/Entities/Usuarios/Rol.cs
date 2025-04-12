@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Domain.Entities.Usuarios
 {
     public class Rol
     {
@@ -15,6 +15,7 @@ namespace Domain.Entities
         public required string Nombre { get; set; }
         public string? Descripcion { get; set; }
         public bool Estado { get; set; }
+        public TipoRol Tipo { get; set; }
 
         [JsonIgnore]
         public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
@@ -22,5 +23,6 @@ namespace Domain.Entities
         public ICollection<RolModulos> RolModulos { get; set; } = new List<RolModulos>();
 
         public ICollection<RolPermisos> RolPermisos { get; set; } = new List<RolPermisos>();
+        public ICollection<RolSeccion> RolSecciones { get; set; } = new List<RolSeccion>();
     }
 }
