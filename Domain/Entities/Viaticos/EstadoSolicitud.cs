@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Viaticos
 {
-    public enum EstadoViatico
+    public enum EstadoSolicitud
     {
-        Borrador = 0,
+        NoEnviada = 0,
         EnRevision = 1,
         Aprobado = 2,
-        Reprobado = 3
+        Rechazado = 3,
+        ParaCorregir = 4
     }
 }

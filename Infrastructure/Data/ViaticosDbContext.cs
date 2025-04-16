@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Common;
 using Domain.Entities.Viaticos;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,7 @@ namespace Infrastructure.Data
         public ViaticosDbContext(DbContextOptions<ViaticosDbContext> options) : base(options) { }
 
         public DbSet<Viatico> Viaticos { get; set; }
+        public DbSet<SolicitudViatico> SolicitudesViatico { get; set; }
         public DbSet<CategoriaViatico> CategoriasViatico { get; set; }
         public DbSet<FacturaViatico> FacturasViatico { get; set; }
         public DbSet<ProveedorViatico> ProveedoresViatico { get; set; }
@@ -20,31 +22,48 @@ namespace Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // SOLICITUD VIATICO
+            modelBuilder.Entity<SolicitudViatico>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+
+                entity.Property(s => s.FechaRegistro)
+                      .HasColumnType("timestamp without time zone")
+                      .IsRequired();
+
+                entity.Property(s => s.FechaModificado)
+                      .HasColumnType("timestamp without time zone")
+                      .IsRequired();
+
+                entity.Property(s => s.Estado)
+                      .IsRequired();
+            });
+
             // VIATICO
             modelBuilder.Entity<Viatico>(entity =>
             {
                 entity.HasKey(v => v.Id);
 
                 entity.Property(v => v.FechaRegistro)
-                .HasColumnType("timestamp without time zone")
-                .IsRequired();
-                entity.Property(v => v.IdUsuario).IsRequired();
-                entity.Property(v => v.CicloId).IsRequired();
+                    .HasColumnType("timestamp without time zone")
+                    .IsRequired();
 
-                entity.Property(v => v.EstadoCiclo)
-                      .HasConversion<string>()
-                      .HasMaxLength(20)
-                      .IsRequired();
+                entity.Property(v => v.FechaModificado)
+                    .HasColumnType("timestamp without time zone")
+                    .IsRequired();
 
                 entity.Property(v => v.EstadoViatico)
-                      .HasConversion<string>()
-                      .HasMaxLength(20)
                       .IsRequired();
 
                 entity.Property(v => v.Comentario);
 
                 entity.Property(v => v.CamposRechazados)
                       .HasColumnType("jsonb");
+
+                entity.HasOne(v => v.SolicitudViatico)
+                      .WithMany(s => s.Viaticos)
+                      .HasForeignKey(v => v.SolicitudViaticoId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(v => v.Factura)
                       .WithMany(f => f.Viaticos)
@@ -112,5 +131,38 @@ namespace Infrastructure.Data
                 entity.Property(v => v.Placa).HasMaxLength(20).IsRequired();
             });
         }
+
+        public override int SaveChanges()
+        {
+            AuditarFechas();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            AuditarFechas();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void AuditarFechas()
+        {
+            var now = DateTime.Now;
+
+            foreach (var entry in ChangeTracker.Entries<ITrackeable>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.FechaRegistro = now;
+                    entry.Entity.FechaModificado = now;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.FechaModificado = now;
+                }
+            }
+        }
+
     }
+
+
 }

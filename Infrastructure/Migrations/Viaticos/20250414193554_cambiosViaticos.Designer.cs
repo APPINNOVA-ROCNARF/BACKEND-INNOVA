@@ -5,6 +5,7 @@ using Domain.Entities.Viaticos;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations.Viaticos
 {
     [DbContext(typeof(ViaticosDbContext))]
-    partial class ViaticosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414193554_cambiosViaticos")]
+    partial class cambiosViaticos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,9 +145,6 @@ namespace Infrastructure.Migrations.Viaticos
                     b.Property<DateTime>("FechaRegistro")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<decimal>("Monto")
-                        .HasColumnType("numeric");
-
                     b.Property<int>("UsuarioAppId")
                         .HasColumnType("integer");
 
@@ -192,9 +192,6 @@ namespace Infrastructure.Migrations.Viaticos
 
                     b.Property<DateTime>("FechaRegistro")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<decimal>("Monto")
-                        .HasColumnType("numeric");
 
                     b.Property<string>("PlacaVehiculo")
                         .HasColumnType("character varying(20)");

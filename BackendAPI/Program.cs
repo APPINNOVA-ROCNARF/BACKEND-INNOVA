@@ -2,6 +2,7 @@ using Application.Interfaces.IAuth;
 using Application.Interfaces.IRol;
 using Application.Interfaces.ISistema;
 using Application.Interfaces.IUsuario;
+using Application.Options;
 using Application.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
@@ -41,6 +42,10 @@ builder.Services.AddSwaggerGen(options =>
 
 });
 
+builder.Services.Configure<ArchivosOptions>(
+    builder.Configuration.GetSection("Archivos"));
+
+
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = Encoding.UTF8.GetBytes(jwtSettings["Secret"]);
 
@@ -77,6 +82,7 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IRolRepository, RolRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<ISistemaRepository, SistemaRepository>();
+
 // Registrar cache
 builder.Services.AddMemoryCache();
 
