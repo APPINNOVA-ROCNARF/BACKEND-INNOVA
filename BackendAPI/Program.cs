@@ -1,3 +1,4 @@
+using Application.Interfaces.IArchivo;
 using Application.Interfaces.IAuth;
 using Application.Interfaces.IRol;
 using Application.Interfaces.ISistema;
@@ -39,7 +40,6 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "API para la gestión del sistema APP INNOVA"
     });
-
 });
 
 builder.Services.Configure<ArchivosOptions>(
@@ -76,12 +76,14 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IRolService, RolService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISistemaService, SistemaService>();
+builder.Services.AddScoped<IArchivoService, ArchivoService>();
 
 // Registrar repositorios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IRolRepository, RolRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<ISistemaRepository, SistemaRepository>();
+builder.Services.AddScoped<IArchivoRepository, ArchivoRepository>();
 
 // Registrar cache
 builder.Services.AddMemoryCache();

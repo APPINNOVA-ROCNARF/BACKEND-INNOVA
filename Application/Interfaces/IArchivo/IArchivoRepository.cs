@@ -9,6 +9,6 @@ namespace Application.Interfaces.IArchivo
 {
     public interface IArchivoRepository
     {
-        Task<string> GuardarArchivoTempAsync(ArchivoDTO archivoDto);
+        Task<string> GuardarArchivoTempAsync(ArchivoDTO archivoDto, string webRootPath);
     }
 }

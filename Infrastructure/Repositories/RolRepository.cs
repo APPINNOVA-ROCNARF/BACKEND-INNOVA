@@ -119,6 +119,10 @@ namespace Infrastructure.Repositories
 
             try
             {
+
+                if (await _context.Roles.AnyAsync(r => r.Nombre == dto.NombreRol))
+                    throw new InvalidOperationException("Ya existe un rol con ese nombre.");
+
                 var nuevoRol = new Domain.Entities.Usuarios.Rol
                 {
                     Nombre = dto.NombreRol,
