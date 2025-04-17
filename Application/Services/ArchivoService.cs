@@ -17,7 +17,7 @@ namespace Application.Services
             _archivoRepository = archivoRepository;
         }
 
-        public async Task<string> SubirArchivoTempAsync(ArchivoDTO archivoDto, string webRootPath)
+        public async Task<string> SubirArchivoTempAsync(ArchivoUploadDTO archivoDto, string webRootPath)
         {
             return await _archivoRepository.GuardarArchivoTempAsync(archivoDto, webRootPath);
         }

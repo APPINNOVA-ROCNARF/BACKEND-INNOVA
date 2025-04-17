@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Viaticos;
+﻿using Application.DTO.ViaticoDTO;
+using Domain.Entities.Viaticos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,6 @@ namespace Application.Interfaces.IViatico
 {
     public interface IViaticoRepository
     {
-        Task<SolicitudViatico> CrearSolicitudViaticoAsync(int usuarioAppId, int cicloId);
-        Task<int> CrearViaticoAsync(Viatico viatico);
+        Task<int> CrearViaticoAsync(CrearViaticoDTO dto);
     }
 }

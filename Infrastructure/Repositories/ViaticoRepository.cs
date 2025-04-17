@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.IViatico;
+﻿using Application.DTO.ViaticoDTO;
+using Application.Interfaces.IViatico;
 using Domain.Entities.Viaticos;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -19,59 +20,26 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<int> CrearViaticoConFacturaAsync(
-            Viatico viatico,
-            FacturaViatico factura,
-            int usuarioAppId,
-            int cicloId,
-            decimal monto)
+        public async Task<int> CrearViaticoAsync(CrearViaticoDTO dto)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            // Validar que no exista una factura con el mismo número y RUC
+            bool facturaDuplicada = await _context.FacturasViatico.AnyAsync(f =>
+                f.NumeroFactura == dto.Factura.NumeroFactura &&
+                f.RucProveedor == dto.Factura.RucProveedor);
 
-            try
+            if (facturaDuplicada)
             {
-                // Insertar factura
-                _context.FacturasViatico.Add(factura);
-                await _context.SaveChangesAsync();
-
-                // Verificar/crear solicitud
-                var solicitud = await _context.SolicitudesViatico
-                    .FirstOrDefaultAsync(s => s.UsuarioAppId == usuarioAppId && s.CicloId == cicloId);
-
-                if (solicitud == null)
-                {
-                    solicitud = new SolicitudViatico
-                    {
-                        UsuarioAppId = usuarioAppId,
-                        CicloId = cicloId,
-                        Estado = EstadoSolicitud.NoEnviada,
-                        Monto = 0,
-                        FechaRegistro = DateTime.UtcNow,
-                        FechaModificado = DateTime.UtcNow
-                    };
-                    _context.SolicitudesViatico.Add(solicitud);
-                    await _context.SaveChangesAsync();
-                }
-
-                // Crear viático con la relación a solicitud y factura
-                viatico.FacturaId = factura.Id;
-                viatico.SolicitudViaticoId = solicitud.Id;
-                _context.Viaticos.Add(viatico);
-
-                // Sumar monto
-                solicitud.Monto += monto;
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-
-                return viatico.Id;
+                throw new InvalidOperationException("Ya existe una factura con ese número y RUC.");
             }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+
+            dto.Viatico.Factura = dto.Factura;
+
+            dto.Viatico.Monto = dto.Monto;
+
+            _context.Viaticos.Add(dto.Viatico);
+            await _context.SaveChangesAsync();
+
+            return dto.Viatico.Id;
         }
-
     }
 }

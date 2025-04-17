@@ -21,7 +21,7 @@ namespace BackendAPI.Controllers.Archivos
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> SubirTemporal([FromBody] ArchivoDTO archivoDto)
+        public async Task<IActionResult> SubirTemporal([FromBody] ArchivoUploadDTO archivoDto)
         {
             if (archivoDto == null || archivoDto.Contenido == null || archivoDto.Contenido.Length == 0)
                 return BadRequest("Archivo no válido.");

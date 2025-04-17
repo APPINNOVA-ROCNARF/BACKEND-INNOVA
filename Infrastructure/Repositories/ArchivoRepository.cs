@@ -15,7 +15,7 @@ namespace Infrastructure.Repositories
             _opciones = opciones.Value;
         }
 
-        public async Task<string> GuardarArchivoTempAsync(ArchivoDTO archivoDto, string webRootPath)
+        public async Task<string> GuardarArchivoTempAsync(ArchivoUploadDTO archivoDto, string webRootPath)
         {
             if (archivoDto == null)
                 throw new ArgumentNullException(nameof(archivoDto), "El archivo enviado está vacío.");
@@ -44,6 +44,36 @@ namespace Infrastructure.Repositories
 
             return rutaRelativa;
         }
+
+        public async Task<string> MoverArchivoFinalAsync(MoverArchivoDTO dto, string webRootPath)
+        {
+            var rutaTemporalCompleta = Path.Combine(webRootPath, dto.RutaRelativaTemporal);
+
+            if (!File.Exists(rutaTemporalCompleta))
+                throw new FileNotFoundException("No se encontró el archivo temporal para mover.", rutaTemporalCompleta);
+
+            var extension = Path.GetExtension(dto.RutaRelativaTemporal);
+            var fechaStr = dto.FechaFactura.ToString("yyyy-MM-dd");
+            var nombreFinal = $"{dto.PrefijoNombre}_{fechaStr}_{Guid.NewGuid()}{extension}";
+
+            var rutaRelativaFinal = Path.Combine(
+                _opciones.RutaBase,
+                "viaticos",
+                $"usuario_{dto.UsuarioAppId}",
+                $"ciclo_{dto.CicloId}",
+                fechaStr,
+                nombreFinal
+            ).Replace("\\", "/");
+
+            var rutaFinalCompleta = Path.Combine(webRootPath, rutaRelativaFinal);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(rutaFinalCompleta)!);
+            File.Move(rutaTemporalCompleta, rutaFinalCompleta);
+
+            return rutaRelativaFinal;
+        }
+
+
     }
 
 }

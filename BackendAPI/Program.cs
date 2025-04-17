@@ -2,7 +2,9 @@ using Application.Interfaces.IArchivo;
 using Application.Interfaces.IAuth;
 using Application.Interfaces.IRol;
 using Application.Interfaces.ISistema;
+using Application.Interfaces.IUnitOfWork;
 using Application.Interfaces.IUsuario;
+using Application.Interfaces.IViatico;
 using Application.Options;
 using Application.Services;
 using Infrastructure.Data;
@@ -77,6 +79,7 @@ builder.Services.AddScoped<IRolService, RolService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISistemaService, SistemaService>();
 builder.Services.AddScoped<IArchivoService, ArchivoService>();
+builder.Services.AddScoped<IViaticoService, ViaticoService>();
 
 // Registrar repositorios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -84,7 +87,13 @@ builder.Services.AddScoped<IRolRepository, RolRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<ISistemaRepository, SistemaRepository>();
 builder.Services.AddScoped<IArchivoRepository, ArchivoRepository>();
+builder.Services.AddScoped<IViaticoRepository, ViaticoRepository>();
+builder.Services.AddScoped<IProveedorViaticoRepository, ProveedorViaticoRepository>();
+builder.Services.AddScoped<IVehiculoRepository, VehiculoRepository>();
+builder.Services.AddScoped<ISolicitudViaticoRepository, SolicitudViaticoRepository>();
 
+//Unit of Work
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // Registrar cache
 builder.Services.AddMemoryCache();
 

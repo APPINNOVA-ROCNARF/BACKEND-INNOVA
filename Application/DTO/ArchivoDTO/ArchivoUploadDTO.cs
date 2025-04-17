@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTO.ArchivoDTO
 {
-    public class ArchivoDTO
+    public class ArchivoUploadDTO
     {
         public string Extension { get; set; } = string.Empty;
         public byte[] Contenido { get; set; } = Array.Empty<byte>();
