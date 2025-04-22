@@ -37,5 +37,13 @@ namespace Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<SolicitudViatico>> ObtenerSolicitudPorCicloAsync(int cicloId)
+        {
+            return await _context.SolicitudesViatico
+                .Where(s => s.CicloId == cicloId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
     }
 }

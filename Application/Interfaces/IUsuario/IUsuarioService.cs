@@ -27,5 +27,8 @@ namespace Application.Interfaces.IUsuario
         Task<List<UsuarioAppSelectDTO>> ObtenerUsuariosAppSelectDTOAsync();
         // Método para obtener el menú de usuario
         Task<List<ModuloMenuDTO>> GetModulosUsuarioAsync(string email);
+        // Método para obtener nombre del usuario desde UsuarioApp
+        Task<string> ObtenerNombreCompletoAsync(int usuarioAppId);
+
     }
 }

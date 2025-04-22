@@ -21,5 +21,9 @@ namespace Application.Services
         {
             return await _repository.ObtenerCiclosSelectAsync();
         }
+        public async Task<string> ObtenerNombreCicloAsync(int cicloId)
+        {
+            return await _repository.ObtenerNombreCicloAsync(cicloId);
+        }
     }
 }

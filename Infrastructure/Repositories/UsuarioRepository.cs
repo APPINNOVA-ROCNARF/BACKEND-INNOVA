@@ -95,5 +95,15 @@ namespace Infrastructure.Repositories
 
             return modulos;
         }
+
+        // Obtener nombre de usuario desde UsuariosApp
+        public async Task<string> ObtenerNombreCompletoAsync(int usuarioAppId)
+        {
+            var usuarioApp = await _context.UsuariosApp
+                .Include(u => u.Usuario)
+                .FirstOrDefaultAsync(u => u.Id == usuarioAppId);
+
+            return usuarioApp?.Usuario?.Nombre ?? "Desconocido";
+        }
     }
 }

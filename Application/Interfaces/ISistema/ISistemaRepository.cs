@@ -10,5 +10,6 @@ namespace Application.Interfaces.ISistema
     public interface ISistemaRepository
     {
         Task<List<CicloSelectDTO>> ObtenerCiclosSelectAsync();
+        Task<string> ObtenerNombreCicloAsync(int cicloId);
     }
 }

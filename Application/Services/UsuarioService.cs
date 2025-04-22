@@ -92,5 +92,10 @@ namespace Application.Services
             return modulos;
         }
 
+        // Obtener nombre de usuario desde UsuarioApp
+        public async Task<String> ObtenerNombreCompletoAsync(int usuarioAppId)
+        {
+            return await _userRepository.ObtenerNombreCompletoAsync(usuarioAppId);
+        }
     }
 }

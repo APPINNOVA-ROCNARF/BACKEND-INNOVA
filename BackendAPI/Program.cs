@@ -80,6 +80,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISistemaService, SistemaService>();
 builder.Services.AddScoped<IArchivoService, ArchivoService>();
 builder.Services.AddScoped<IViaticoService, ViaticoService>();
+builder.Services.AddScoped<ISolicitudViaticoService, SolicitudViaticoService>();
 
 // Registrar repositorios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();

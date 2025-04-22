@@ -30,5 +30,12 @@ namespace Infrastructure.Repositories
                 })
                 .ToListAsync();
         }
+        public async Task<string> ObtenerNombreCicloAsync(int cicloId)
+        {
+            var ciclo = await _context.Ciclos
+                .FirstOrDefaultAsync(c => c.Id == cicloId);
+
+            return ciclo?.Nombre ?? "Desconocido";
+        }
     }
 }

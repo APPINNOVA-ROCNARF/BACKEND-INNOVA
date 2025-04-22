@@ -9,15 +9,17 @@ namespace BackendAPI.Controllers.Viatico
     public class ViaticosController : ControllerBase
     {
         private readonly IViaticoService _viaticoService;
+        private readonly ISolicitudViaticoService _solicitudViaticoService;
         private readonly IWebHostEnvironment _env;
 
-        public ViaticosController(IViaticoService viaticoService, IWebHostEnvironment env)
+        public ViaticosController(IViaticoService viaticoService, ISolicitudViaticoService solicitudViaticoService, IWebHostEnvironment env)
         {
             _viaticoService = viaticoService;
+            _solicitudViaticoService = solicitudViaticoService;
             _env = env;
         }
 
-        [HttpPost("crear")]
+        [HttpPost]
         public async Task<IActionResult> CrearViatico([FromBody] ViaticoCrearDTO dto)
         {
             if (dto == null || dto.Factura == null)
@@ -37,14 +39,19 @@ namespace BackendAPI.Controllers.Viatico
             }
             catch (InvalidOperationException ex)
             {
-                // Errores de negocio como factura duplicada
                 return BadRequest(new { mensaje = ex.Message });
             }
             catch (Exception ex)
             {
-                // Errores inesperados
                 return StatusCode(500, new { mensaje = "Ocurrió un error interno.", detalle = ex.Message });
             }
+        }
+
+        [HttpGet("solicitud/ciclo/{cicloId}")]
+        public async Task<IActionResult> ObtenerSolicitudPorCicloAsync(int cicloId)
+        {
+            var resultado = await _solicitudViaticoService.ObtenerSolicitudPorCicloAsync(cicloId);
+            return Ok(resultado);
         }
     }
 }
