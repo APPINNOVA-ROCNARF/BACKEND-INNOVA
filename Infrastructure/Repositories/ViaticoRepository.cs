@@ -41,5 +41,14 @@ namespace Infrastructure.Repositories
 
             return dto.Viatico.Id;
         }
+
+        public async Task<EstadisticaSolicitudViaticoDTO?> ObtenerEstadisticaSolicitudViaticoAsync(int cicloId)
+        {
+            var sql = "SELECT * FROM fn_dashboard_solicitudes_viatico({0})";
+            return await _context.Set<EstadisticaSolicitudViaticoDTO>()
+                .FromSqlRaw(sql, cicloId)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+        }
     }
 }

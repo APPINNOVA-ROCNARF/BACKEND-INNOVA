@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.DTO.ViaticoDTO;
 using Domain.Common;
 using Domain.Entities.Viaticos;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +20,13 @@ namespace Infrastructure.Data
         public DbSet<FacturaViatico> FacturasViatico { get; set; }
         public DbSet<ProveedorViatico> ProveedoresViatico { get; set; }
         public DbSet<Vehiculo> Vehiculos { get; set; }
+        public DbSet<EstadisticaSolicitudViaticoDTO> EstadisticaSolicitudViatico { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<EstadisticaSolicitudViaticoDTO>().HasNoKey();
+
             // SOLICITUD VIATICO
             modelBuilder.Entity<SolicitudViatico>(entity =>
             {

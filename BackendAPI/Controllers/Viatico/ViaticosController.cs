@@ -53,5 +53,16 @@ namespace BackendAPI.Controllers.Viatico
             var resultado = await _solicitudViaticoService.ObtenerSolicitudPorCicloAsync(cicloId);
             return Ok(resultado);
         }
+
+        [HttpGet("estadistica-solicitud-viatico/{cicloId}")]
+        public async Task<IActionResult> GetDashboard(int cicloId)
+        {
+            var resultado = await _viaticoService.ObtenerEstadisticaSolicitudViaticoAsync(cicloId);
+
+            if (resultado == null)
+                return NotFound("No se encontró información para el ciclo indicado.");
+
+            return Ok(resultado);
+        }
     }
 }

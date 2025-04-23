@@ -22,11 +22,11 @@ namespace Infrastructure.Repositories
         public async Task<List<CicloSelectDTO>> ObtenerCiclosSelectAsync()
         {
             return await _context.Ciclos
-                .Where(c => c.Estado)
                 .Select(c => new CicloSelectDTO
                 {
                     Id = c.Id,
-                    Nombre = c.Nombre
+                    Nombre = c.Nombre,
+                    Estado = c.Estado
                 })
                 .ToListAsync();
         }

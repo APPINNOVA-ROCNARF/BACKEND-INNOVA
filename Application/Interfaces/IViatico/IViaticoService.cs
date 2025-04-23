@@ -10,5 +10,7 @@ namespace Application.Interfaces.IViatico
     public interface IViaticoService
     {
         Task<int> CrearViaticoAsync(ViaticoCrearDTO dto, string webRootPath);
+
+        Task<EstadisticaSolicitudViaticoDTO> ObtenerEstadisticaSolicitudViaticoAsync(int cicloId);
     }
 }

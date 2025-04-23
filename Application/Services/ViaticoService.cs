@@ -142,6 +142,11 @@ namespace Application.Services
                 throw;
             }
         }
+
+        public async Task<EstadisticaSolicitudViaticoDTO?> ObtenerEstadisticaSolicitudViaticoAsync(int cicloId)
+        {
+            return await _viaticoRepository.ObtenerEstadisticaSolicitudViaticoAsync(cicloId);
+        }
     }
 
 }
