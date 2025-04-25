@@ -147,6 +147,11 @@ namespace Application.Services
         {
             return await _viaticoRepository.ObtenerEstadisticaSolicitudViaticoAsync(cicloId);
         }
+
+        public async Task<IEnumerable<ViaticoListDTO>> ObtenerViaticosPorSolicitudAsync(int solicitudId)
+        {
+            return await _viaticoRepository.ObtenerViaticosPorSolicitudAsync(solicitudId);
+        }
     }
 
 }

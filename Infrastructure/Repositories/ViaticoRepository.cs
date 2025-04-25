@@ -1,4 +1,5 @@
 ﻿using Application.DTO.ViaticoDTO;
+using Application.Helpers;
 using Application.Interfaces.IViatico;
 using Domain.Entities.Viaticos;
 using Infrastructure.Data;
@@ -49,6 +50,29 @@ namespace Infrastructure.Repositories
                 .FromSqlRaw(sql, cicloId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<ViaticoListDTO>> ObtenerViaticosPorSolicitudAsync(int solicitudId)
+        {
+            return await _context.Viaticos
+                .Include(v => v.Factura)
+                    .ThenInclude(f => f.Proveedor)
+                .Include(v => v.Categoria)
+                .Where(v => v.SolicitudViaticoId == solicitudId)
+                .Select(v => new ViaticoListDTO
+                {
+                    Id = v.Id,
+                    FechaFactura = v.Factura != null ? v.Factura.FechaFactura : DateTime.MinValue,
+                    NombreCategoria = v.Categoria.Nombre,
+                    NombreProveedor = v.Factura != null ? v.Factura.Proveedor.RazonSocial : string.Empty,
+                    NumeroFactura = v.Factura != null ? v.Factura.NumeroFactura : string.Empty,
+                    Comentario = v.Comentario,
+                    Monto = v.Factura != null ? v.Factura.Total : 0,
+                    EstadoViatico = v.EstadoViatico.ToFriendlyString(),
+                    RutaImagen = v.Factura != null ? v.Factura.RutaImagen : string.Empty,
+                    CamposRechazados = v.CamposRechazados
+                })
+                .ToListAsync();
         }
     }
 }
