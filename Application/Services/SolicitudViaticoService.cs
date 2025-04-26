@@ -42,7 +42,6 @@ namespace Application.Services
                 {
                     Id = solicitud.Id,
                     UsuarioNombre = nombreUsuario,
-                    CicloNombre = nombreCiclo,
                     FechaRegistro = solicitud.FechaRegistro,
                     FechaModificacion = solicitud.FechaModificado,
                     Monto = solicitud.Monto,

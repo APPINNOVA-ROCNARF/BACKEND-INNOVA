@@ -11,6 +11,6 @@ namespace Domain.Entities.Viaticos
         Borrador = 0,
         EnRevision = 1,
         Aprobado = 2,
-        Reprobado = 3
+        Rechazado = 3
     }
 }

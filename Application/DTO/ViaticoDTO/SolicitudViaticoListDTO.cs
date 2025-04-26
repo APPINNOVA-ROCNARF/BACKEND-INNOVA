@@ -10,7 +10,6 @@ namespace Application.DTO.ViaticoDTO
     {
         public int Id { get; set; }
         public string UsuarioNombre { get; set; } = string.Empty;
-        public string CicloNombre { get; set; } = string.Empty;
         public DateTime FechaRegistro { get; set; }
         public DateTime FechaModificacion { get; set; }
         public string Estado { get; set; } = string.Empty;

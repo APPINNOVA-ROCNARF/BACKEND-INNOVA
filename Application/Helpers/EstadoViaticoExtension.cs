@@ -16,7 +16,7 @@ namespace Application.Helpers
                 EstadoViatico.Borrador => "Borrador",
                 EstadoViatico.EnRevision => "En revisión",
                 EstadoViatico.Aprobado => "Aprobado",
-                EstadoViatico.Reprobado => "Reprobado",
+                EstadoViatico.Rechazado => "Rechazado",
                 _ => "Desconocido"
             };
         }
