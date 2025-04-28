@@ -78,5 +78,12 @@ namespace BackendAPI.Controllers.Viatico
             var resultado = await _solicitudViaticoService.ObtenerDetalleSolicitud(solicitudId);
             return Ok(resultado);
         }
+
+        [HttpPost("actualizar-estado")]
+        public async Task<IActionResult> ActualizarEstadoViaticos([FromBody] ActualizarEstadoViaticoRequest request)
+        {
+            await _viaticoService.ActualizarEstadoViaticosAsync(request);
+            return Ok(new { success = true, message = "Estado de viáticos actualizado correctamente." });
+        }
     }
 }

@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Application.Interfaces.IArchivo;
 using Application.Interfaces.IAuth;
 using Application.Interfaces.IRol;
@@ -7,6 +8,9 @@ using Application.Interfaces.IUsuario;
 using Application.Interfaces.IViatico;
 using Application.Options;
 using Application.Services;
+using Application.Validators.Viatico;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -49,6 +53,13 @@ builder.Services.AddRateLimiter(options =>
 
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
+
+// Validators
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<ViaticoCrearValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ActualizarEstadoViaticoRequestValidator>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -137,6 +148,28 @@ app.UseAuthentication();
     app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRateLimiter();
+
+app.UseExceptionHandler(config =>
+{
+    config.Run(async context =>
+    {
+        var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+
+        if (exception is BusinessException businessException)
+        {
+            context.Response.StatusCode = businessException.StatusCode;
+            context.Response.ContentType = "application/json";
+
+            var response = new
+            {
+                success = false,
+                message = businessException.Message
+            };
+
+            await context.Response.WriteAsJsonAsync(response);
+        }
+    });
+});
 
 
 app.Run();

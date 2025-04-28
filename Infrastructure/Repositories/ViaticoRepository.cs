@@ -1,6 +1,7 @@
 ﻿using Application.DTO.ViaticoDTO;
 using Application.Helpers;
 using Application.Interfaces.IViatico;
+using Domain.Entities.Viaticos;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,6 +68,19 @@ namespace Infrastructure.Repositories
                     CamposRechazados = v.CamposRechazados
                 })
                 .ToListAsync();
+        }
+
+        public async Task<List<Viatico>> ObtenerViaticosPorIdsAsync(List<int> ids)
+        {
+            return await _context.Viaticos
+                .Where(v => ids.Contains(v.Id))
+                .ToListAsync();
+        }
+
+        public async Task ActualizarViaticosAsync(List<Viatico> viaticos)
+        {
+            _context.Viaticos.UpdateRange(viaticos);
+            await _context.SaveChangesAsync();
         }
     }
 }

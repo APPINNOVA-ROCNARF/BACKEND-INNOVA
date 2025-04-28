@@ -52,5 +52,18 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(s => s.Id == solicitudId);
         }
 
+        public async Task<SolicitudViatico> ObtenerViaticosPorIdAsync(int solicitudId)
+        {
+            return await _context.SolicitudesViatico
+                .Include(s => s.Viaticos) 
+                .FirstOrDefaultAsync(s => s.Id == solicitudId);
+        }
+
+        public async Task ActualizarEstadoAsync(SolicitudViatico solicitud)
+        {
+            _context.SolicitudesViatico.Update(solicitud);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

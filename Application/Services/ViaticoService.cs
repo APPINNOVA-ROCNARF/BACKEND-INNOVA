@@ -1,5 +1,7 @@
 ﻿using Application.DTO.ArchivoDTO;
 using Application.DTO.ViaticoDTO;
+using Application.Enums.Viatico;
+using Application.Exceptions;
 using Application.Helpers;
 using Application.Interfaces.IArchivo;
 using Application.Interfaces.IUnitOfWork;
@@ -151,6 +153,130 @@ namespace Application.Services
         public async Task<IEnumerable<ViaticoListDTO>> ObtenerViaticosPorSolicitudAsync(int solicitudId)
         {
             return await _viaticoRepository.ObtenerViaticosPorSolicitudAsync(solicitudId);
+        }
+
+        public async Task ActualizarEstadoViaticosAsync(ActualizarEstadoViaticoRequest request)
+        {
+            if (request.Viaticos == null || request.Viaticos.Count == 0)
+                throw new BusinessException("Debe seleccionar al menos un viático.");
+
+            await _unitOfWork.BeginTransactionAsync();
+
+            try
+            {
+                var ids = request.Viaticos.Select(v => v.Id).ToList();
+                var viaticos = await _viaticoRepository.ObtenerViaticosPorIdsAsync(ids);
+
+                if (viaticos.Count != ids.Count)
+                    throw new BusinessException("Uno o más viáticos no existen.");
+
+                foreach (var viatico in viaticos)
+                {
+                    ValidarEstadoActual(viatico, request.Accion);
+
+                    switch (request.Accion)
+                    {
+                        case AccionViatico.Aprobar:
+                            AprobarViatico(viatico);
+                            break;
+
+                        case AccionViatico.Rechazar:
+                            RechazarViatico(viatico, request);
+                            break;
+                    }
+                }
+
+                await _viaticoRepository.ActualizarViaticosAsync(viaticos);
+
+                var solicitudesIds = viaticos.Select(v => v.SolicitudViaticoId).Distinct().ToList();
+                await ActualizarEstadoSolicitudesAsync(solicitudesIds);
+
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
+        }
+
+        private void ValidarEstadoActual(Viatico viatico, AccionViatico accion)
+        {
+            if (accion == AccionViatico.Aprobar && viatico.EstadoViatico == EstadoViatico.Aprobado)
+                throw new BusinessException($"El viático {viatico.Id} ya está aprobado.");
+
+            if (accion == AccionViatico.Rechazar && viatico.EstadoViatico == EstadoViatico.Rechazado)
+                throw new BusinessException($"El viático {viatico.Id} ya está rechazado.");
+        }
+
+        private void AprobarViatico(Viatico viatico)
+        {
+            viatico.EstadoViatico = EstadoViatico.Aprobado;
+            viatico.Comentario = null;
+            viatico.CamposRechazados = null;
+        }
+
+        private void RechazarViatico(Viatico viatico, ActualizarEstadoViaticoRequest request)
+        {
+            viatico.EstadoViatico = EstadoViatico.Rechazado;
+
+            if (request.Viaticos.Count > 1)
+            {
+                // Rechazo masivo
+                viatico.Comentario = "Viático inválido";
+                viatico.CamposRechazados = null;
+            }
+            else
+            {
+                // Rechazo individual
+                var viaticoRequest = request.Viaticos.FirstOrDefault(v => v.Id == viatico.Id);
+
+                if (viaticoRequest != null)
+                {
+                    viatico.Comentario = string.IsNullOrWhiteSpace(viaticoRequest.Comentario)
+                        ? "Viático inválido"
+                        : viaticoRequest.Comentario;
+
+                    viatico.CamposRechazados = viaticoRequest.CamposRechazados?.Select(c => new CampoRechazado
+                    {
+                        Campo = c.Campo,
+                        Comentario = c.Comentario
+                    }).ToList();
+                }
+                else
+                {
+                    viatico.Comentario = "Viático inválido";
+                    viatico.CamposRechazados = null;
+                }
+            }
+        }
+
+        private async Task ActualizarEstadoSolicitudesAsync(List<int> solicitudesIds)
+        {
+            foreach (var solicitudId in solicitudesIds)
+            {
+                var solicitud = await _solicitudRepository.ObtenerViaticosPorIdAsync(solicitudId);
+
+                if (solicitud == null)
+                    continue;
+
+                var estadosViaticos = solicitud.Viaticos.Select(v => v.EstadoViatico).ToList();
+
+                if (estadosViaticos.All(e => e == EstadoViatico.Aprobado))
+                {
+                    solicitud.Estado = EstadoSolicitud.Aprobado;
+                }
+                else if (estadosViaticos.Any(e => e == EstadoViatico.Rechazado))
+                {
+                    solicitud.Estado = EstadoSolicitud.Rechazado;
+                }
+                else
+                {
+                    solicitud.Estado = EstadoSolicitud.EnRevision;
+                }
+
+                await _solicitudRepository.ActualizarEstadoAsync(solicitud);
+            }
         }
     }
 
