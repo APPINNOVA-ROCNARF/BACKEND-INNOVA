@@ -1,14 +1,8 @@
 ﻿using Application.DTO.ViaticoDTO;
 using Application.Helpers;
 using Application.Interfaces.IViatico;
-using Domain.Entities.Viaticos;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {

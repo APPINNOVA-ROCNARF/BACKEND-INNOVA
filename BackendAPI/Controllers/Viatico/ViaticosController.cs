@@ -66,9 +66,16 @@ namespace BackendAPI.Controllers.Viatico
         }
 
         [HttpGet("{solicitudId:int}")]
-        public async Task<ActionResult<IEnumerable<ViaticoListDTO>>> GetListadoPorSolicitud(int solicitudId)
+        public async Task<ActionResult<IEnumerable<ViaticoListDTO>>> GetViaticoPorSolicitud(int solicitudId)
         {
             var resultado = await _viaticoService.ObtenerViaticosPorSolicitudAsync(solicitudId);
+            return Ok(resultado);
+        }
+
+        [HttpGet("solicitud/detalle/{solicitudId}")]
+        public async Task<IActionResult> ObtenerDetalleSolicitud(int solicitudId)
+        {
+            var resultado = await _solicitudViaticoService.ObtenerDetalleSolicitud(solicitudId);
             return Ok(resultado);
         }
     }

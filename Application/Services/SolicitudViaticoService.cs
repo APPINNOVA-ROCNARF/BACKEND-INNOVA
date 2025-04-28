@@ -8,6 +8,7 @@ using Application.Helpers;
 using Application.Interfaces.ISistema;
 using Application.Interfaces.IUsuario;
 using Application.Interfaces.IViatico;
+using Domain.Entities.Viaticos;
 
 namespace Application.Services
 {
@@ -48,6 +49,26 @@ namespace Application.Services
                     Estado = solicitud.Estado.ToFriendlyString()
                 });
             }
+
+            return result;
+        }
+
+        public async Task<DetalleSolicitudDTO> ObtenerDetalleSolicitud(int solicitudId)
+        {
+            var solicitud = await _solicitudRepository.ObtenerDetalleSolicitud(solicitudId);
+
+            var nombreUsuario = await _usuarioService.ObtenerNombreCompletoAsync(solicitud.UsuarioAppId);
+
+            var nombreCiclo = await _cicloService.ObtenerNombreCicloAsync(solicitud.CicloId);
+
+            var result = new DetalleSolicitudDTO
+            {
+                UsuarioNombre = nombreUsuario,
+                FechaRegistro = solicitud.FechaRegistro,
+                FechaModificacion = solicitud.FechaModificado,
+                Estado = solicitud.Estado.ToFriendlyString(),
+                CicloNombre = nombreCiclo
+            };
 
             return result;
         }

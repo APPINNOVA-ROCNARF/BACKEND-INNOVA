@@ -13,5 +13,6 @@ namespace Application.Interfaces.IViatico
         Task CrearAsync(SolicitudViatico solicitud);
         Task ActualizarMontoAsync(SolicitudViatico solicitud);
         Task<List<SolicitudViatico>> ObtenerSolicitudPorCicloAsync(int cicloId);
+        Task<SolicitudViatico?> ObtenerDetalleSolicitud(int solicitudId);
     }
 }

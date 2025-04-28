@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.DTO.ViaticoDTO;
 using Application.Interfaces.IViatico;
 using Domain.Entities.Viaticos;
 using Infrastructure.Data;
@@ -43,6 +44,12 @@ namespace Infrastructure.Repositories
                 .Where(s => s.CicloId == cicloId)
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        public async Task<SolicitudViatico?> ObtenerDetalleSolicitud(int solicitudId)
+        {
+            return await _context.SolicitudesViatico
+                .FirstOrDefaultAsync(s => s.Id == solicitudId);
         }
 
     }
