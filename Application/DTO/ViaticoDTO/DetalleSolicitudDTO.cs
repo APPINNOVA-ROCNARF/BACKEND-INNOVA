@@ -13,5 +13,6 @@ namespace Application.DTO.ViaticoDTO
         public DateTime FechaModificacion { get; set; }
         public string Estado { get; set; } = string.Empty;
         public string CicloNombre { get; set; } = string.Empty;
+        public int CicloId { get; set; }
     }
 }
