@@ -18,22 +18,24 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Npgsql;
 using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(builder.Configuration.GetConnectionString("DefaultConnection"));
+dataSourceBuilder.UseJsonNet(); 
+var dataSource = dataSourceBuilder.Build();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .LogTo(Console.WriteLine, LogLevel.Information));
+    options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information));
 
 builder.Services.AddDbContext<SistemaDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-               .LogTo(Console.WriteLine, LogLevel.Information));
+    options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information));
 
 builder.Services.AddDbContext<ViaticosDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-               .LogTo(Console.WriteLine, LogLevel.Information));
+    options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information));
 
 // Configurar el Rate Limiter
 builder.Services.AddRateLimiter(options =>

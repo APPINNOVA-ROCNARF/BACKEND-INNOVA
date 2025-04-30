@@ -266,7 +266,7 @@ namespace Application.Services
                 {
                     solicitud.Estado = EstadoSolicitud.Aprobado;
                 }
-                else if (estadosViaticos.Any(e => e == EstadoViatico.Rechazado))
+                else if (estadosViaticos.All(e => e == EstadoViatico.Rechazado))
                 {
                     solicitud.Estado = EstadoSolicitud.Rechazado;
                 }
@@ -278,6 +278,7 @@ namespace Application.Services
                 await _solicitudRepository.ActualizarEstadoAsync(solicitud);
             }
         }
+
     }
 
 }
