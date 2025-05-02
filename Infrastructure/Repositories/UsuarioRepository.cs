@@ -1,5 +1,6 @@
 ﻿using Application.DTO.MenuDTO;
 using Application.DTO.UsuarioDTO;
+using Application.Exceptions;
 using Application.Interfaces.IUsuario;
 using Domain.Entities.Usuarios;
 using Infrastructure.Data;
@@ -104,6 +105,18 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(u => u.Id == usuarioAppId);
 
             return usuarioApp?.Usuario?.Nombre ?? "Desconocido";
+        }
+
+        public async Task<int> ObtenerIdPorNombreUsuarioAsync(string nombreUsuario)
+        {
+            var usuarioApp = await _context.UsuariosApp
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
+
+            if (usuarioApp == null)
+                throw new BusinessException($"No se encontró un usuario con el nombre '{nombreUsuario}'.");
+
+            return usuarioApp.Id;
         }
     }
 }

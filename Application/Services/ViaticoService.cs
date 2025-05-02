@@ -5,6 +5,7 @@ using Application.Exceptions;
 using Application.Helpers;
 using Application.Interfaces.IArchivo;
 using Application.Interfaces.IUnitOfWork;
+using Application.Interfaces.IVehiculo;
 using Application.Interfaces.IViatico;
 using Domain.Entities.Viaticos;
 using System;
@@ -68,7 +69,7 @@ namespace Application.Services
                     await _proveedorRepository.CrearAsync(proveedor);
                 }
 
-                if (!string.IsNullOrWhiteSpace(dto.PlacaVehiculo))
+                /*if (!string.IsNullOrWhiteSpace(dto.PlacaVehiculo))
                 {
                     var vehiculo = new Vehiculo
                     {
@@ -80,7 +81,7 @@ namespace Application.Services
                         await _vehiculoRepository.CrearAsync(vehiculo);
                     }
                 }
-
+                */
 
                 var solicitud = await _solicitudRepository.ObtenerPorCicloUsuarioAsync(dto.CicloId, dto.UsuarioAppId);
                 if (solicitud == null)
@@ -113,7 +114,7 @@ namespace Application.Services
                     Comentario = dto.Comentario,
                     EstadoViatico = EstadoViatico.Borrador,
                     SolicitudViaticoId = solicitud.Id,
-                    PlacaVehiculo = dto.PlacaVehiculo
+                    VehiculoId = dto.VehiculoId
                 };
 
                 var crearDTO = new CrearViaticoDTO

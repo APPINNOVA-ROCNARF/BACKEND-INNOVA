@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 
 namespace Domain.Common
 {
-    public interface ITrackeable
+    public interface ICreado
     {
         DateTime FechaRegistro { get; set; }
+    }
+
+    public interface IModificado
+    {
         DateTime FechaModificado { get; set; }
     }
 }

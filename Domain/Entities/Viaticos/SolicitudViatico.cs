@@ -7,7 +7,7 @@ using Domain.Common;
 
 namespace Domain.Entities.Viaticos
 {
-    public class SolicitudViatico : ITrackeable
+    public class SolicitudViatico : ICreado, IModificado
     {
         public int Id { get; set; }
 

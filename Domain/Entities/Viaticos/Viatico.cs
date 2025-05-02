@@ -7,7 +7,7 @@ using Domain.Common;
 
 namespace Domain.Entities.Viaticos
 {
-    public class Viatico : ITrackeable
+    public class Viatico : ICreado, IModificado
     {
         public int Id { get; set; }
 
@@ -20,8 +20,7 @@ namespace Domain.Entities.Viaticos
 
         public int? FacturaId { get; set; }
         public FacturaViatico? Factura { get; set; }
-
-        public string? PlacaVehiculo { get; set; }
+        public int? VehiculoId { get; set; }
         public Vehiculo? Vehiculo { get; set; }
         public EstadoViatico EstadoViatico { get; set; }
         public string? Comentario { get; set; }

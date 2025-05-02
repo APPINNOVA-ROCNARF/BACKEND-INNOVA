@@ -1,4 +1,5 @@
-﻿using Application.DTO.ViaticoDTO;
+﻿using Application.DTO.VehiculoDTO;
+using Application.DTO.ViaticoDTO;
 using Application.Helpers;
 using Application.Interfaces.IViatico;
 using Domain.Entities.Viaticos;
@@ -53,6 +54,7 @@ namespace Infrastructure.Repositories
                 .Include(v => v.Factura)
                     .ThenInclude(f => f.Proveedor)
                 .Include(v => v.Categoria)
+                .Include(v => v.Vehiculo)
                 .Where(v => v.SolicitudViaticoId == solicitudId)
                 .Select(v => new ViaticoListDTO
                 {
@@ -65,7 +67,16 @@ namespace Infrastructure.Repositories
                     Monto = v.Factura != null ? v.Factura.Total : 0,
                     EstadoViatico = v.EstadoViatico.ToFriendlyString(),
                     RutaImagen = v.Factura != null ? v.Factura.RutaImagen : string.Empty,
-                    CamposRechazados = v.CamposRechazados
+                    CamposRechazados = v.CamposRechazados,
+                    Vehiculo = v.Categoria.Nombre == "Movilización" && v.Vehiculo != null
+                        ? new VehiculoViaticoDTO
+                        {
+                            Placa = v.Vehiculo.Placa,
+                            Modelo = v.Vehiculo.Modelo,
+                            Color = v.Vehiculo.Color,
+                            Fabricante = v.Vehiculo.Fabricante
+                        }
+                : null
                 })
                 .ToListAsync();
         }

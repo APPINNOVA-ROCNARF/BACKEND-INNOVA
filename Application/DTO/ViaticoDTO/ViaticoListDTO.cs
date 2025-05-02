@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Viaticos;
+﻿using Application.DTO.VehiculoDTO;
+using Domain.Entities.Viaticos;
 
 namespace Application.DTO.ViaticoDTO
 {
@@ -14,5 +15,6 @@ namespace Application.DTO.ViaticoDTO
         public string EstadoViatico { get; set; } = string.Empty;
         public string RutaImagen { get; set; } = string.Empty;
         public List<CampoRechazado>? CamposRechazados { get; set; }
+        public VehiculoViaticoDTO? Vehiculo { get; set; }
     }
 }

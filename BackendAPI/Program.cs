@@ -5,9 +5,11 @@ using Application.Interfaces.IRol;
 using Application.Interfaces.ISistema;
 using Application.Interfaces.IUnitOfWork;
 using Application.Interfaces.IUsuario;
+using Application.Interfaces.IVehiculo;
 using Application.Interfaces.IViatico;
 using Application.Options;
 using Application.Services;
+using Application.Validators.Vehiculo;
 using Application.Validators.Viatico;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -61,6 +63,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<ViaticoCrearValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<ActualizarEstadoViaticoRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegistrarVehiculoDTOValidator>();
 
 
 builder.Services.AddControllers();
@@ -113,6 +116,8 @@ builder.Services.AddScoped<ISistemaService, SistemaService>();
 builder.Services.AddScoped<IArchivoService, ArchivoService>();
 builder.Services.AddScoped<IViaticoService, ViaticoService>();
 builder.Services.AddScoped<ISolicitudViaticoService, SolicitudViaticoService>();
+builder.Services.AddScoped<IVehiculoService, VehiculoService>();
+
 
 // Registrar repositorios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -124,6 +129,7 @@ builder.Services.AddScoped<IViaticoRepository, ViaticoRepository>();
 builder.Services.AddScoped<IProveedorViaticoRepository, ProveedorViaticoRepository>();
 builder.Services.AddScoped<IVehiculoRepository, VehiculoRepository>();
 builder.Services.AddScoped<ISolicitudViaticoRepository, SolicitudViaticoRepository>();
+
 
 //Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

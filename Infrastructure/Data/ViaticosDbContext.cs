@@ -21,11 +21,13 @@ namespace Infrastructure.Data
         public DbSet<ProveedorViatico> ProveedoresViatico { get; set; }
         public DbSet<Vehiculo> Vehiculos { get; set; }
         public DbSet<EstadisticaSolicitudViaticoDTO> EstadisticaSolicitudViatico { get; set; }
+        public DbSet<VehiculoPrincipal> VehiculoPrincipal { get; set; }
+        public DbSet<SolicitudVehiculoPrincipal> SolicitudVehiculoPrincipal { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.Entity<EstadisticaSolicitudViaticoDTO>().HasNoKey();
+            modelBuilder.Entity<EstadisticaSolicitudViaticoDTO>().HasNoKey().ToView(null);
 
             // SOLICITUD VIATICO
             modelBuilder.Entity<SolicitudViatico>(entity =>
@@ -82,8 +84,7 @@ namespace Infrastructure.Data
 
                 entity.HasOne(v => v.Vehiculo)
                       .WithMany(vh => vh.Viaticos)
-                      .HasForeignKey(v => v.PlacaVehiculo)
-                      .HasPrincipalKey(vh => vh.Placa)
+                      .HasForeignKey(v => v.VehiculoId)
                       .OnDelete(DeleteBehavior.SetNull);
             });
 
@@ -132,9 +133,82 @@ namespace Infrastructure.Data
             // VEHICULO
             modelBuilder.Entity<Vehiculo>(entity =>
             {
-                entity.HasKey(v => v.Placa);
-                entity.Property(v => v.Placa).HasMaxLength(20).IsRequired();
+                entity.HasKey(v => v.Id);
+
+                entity.Property(v => v.Placa)
+                      .HasMaxLength(10)
+                      .IsRequired();
+
+                entity.Property(v => v.Fabricante)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(v => v.Modelo)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(v => v.Color)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(v => v.FechaRegistro)
+                      .HasColumnType("timestamp without time zone")
+                      .IsRequired();
+
+                entity.Property(v => v.UsuarioAppId)
+                      .IsRequired();
+
+                entity.HasIndex(v => v.Placa )
+                      .IsUnique(); 
             });
+
+            modelBuilder.Entity<VehiculoPrincipal>(entity =>
+            {
+                entity.HasKey(vp => vp.UsuarioAppId);
+
+                entity.Property(vp => vp.UsuarioAppId)
+                      .ValueGeneratedNever();
+
+                entity.Property(vp => vp.FechaModificado)
+                      .HasColumnType("timestamp without time zone")
+                      .IsRequired();
+
+                entity.HasOne(vp => vp.Vehiculo)
+                      .WithMany()
+                      .HasForeignKey(vp => vp.VehiculoId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<SolicitudVehiculoPrincipal>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+
+                entity.Property(s => s.UsuarioAppId)
+                      .IsRequired();
+
+                entity.Property(s => s.VehiculoIdSolicitado)
+                      .IsRequired();
+
+                entity.Property(s => s.Motivo)
+                      .HasMaxLength(500)
+                      .IsRequired();
+
+                entity.Property(s => s.FechaRegistro)
+                      .HasColumnType("timestamp without time zone")
+                      .IsRequired();
+
+                entity.Property(s => s.Estado)
+                      .HasConversion<int>()
+                      .IsRequired();
+
+                entity.Property(s => s.AprobadoPorUsuarioId)
+                      .IsRequired(false); 
+
+                entity.Property(s => s.FechaAprobacion)
+                      .HasColumnType("timestamp without time zone")
+                      .IsRequired(false);
+            });
+
         }
 
         public override int SaveChanges()
@@ -153,16 +227,17 @@ namespace Infrastructure.Data
         {
             var now = DateTime.Now;
 
-            foreach (var entry in ChangeTracker.Entries<ITrackeable>())
+            foreach (var entry in ChangeTracker.Entries())
             {
-                if (entry.State == EntityState.Added)
+                if (entry.Entity is ICreado creado && entry.State == EntityState.Added)
                 {
-                    entry.Entity.FechaRegistro = now;
-                    entry.Entity.FechaModificado = now;
+                    creado.FechaRegistro = now;
                 }
-                else if (entry.State == EntityState.Modified)
+
+                if (entry.Entity is IModificado modificado &&
+                    (entry.State == EntityState.Added || entry.State == EntityState.Modified))
                 {
-                    entry.Entity.FechaModificado = now;
+                    modificado.FechaModificado = now;
                 }
             }
         }

@@ -45,9 +45,8 @@ namespace Application.Validators.Viatico
                     .LessThanOrEqualTo(DateTime.Now).WithMessage("La fecha de factura no puede ser futura.");
             });
 
-            RuleFor(x => x.PlacaVehiculo)
-                .MaximumLength(10).When(x => !string.IsNullOrWhiteSpace(x.PlacaVehiculo))
-                .WithMessage("La placa no puede exceder 10 caracteres.");
+            RuleFor(x => x.VehiculoId)
+                .GreaterThan(0).WithMessage("El vehiculo es obligatorio.");
         }
     }
 }

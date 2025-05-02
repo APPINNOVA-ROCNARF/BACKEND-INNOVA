@@ -5,11 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities.Viaticos;
 
-namespace Application.Interfaces.IViatico
+namespace Application.Interfaces.IVehiculo
 {
     public interface IVehiculoRepository
     {
-        Task<bool> ExistePorPlacaAsync(string placa);
-        Task CrearAsync(Vehiculo vehiculo);
+        Task<int> RegistrarVehiculoAsync(Vehiculo vehiculo);
     }
 }

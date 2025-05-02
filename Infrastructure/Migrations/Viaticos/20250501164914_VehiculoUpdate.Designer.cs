@@ -5,6 +5,7 @@ using Domain.Entities.Viaticos;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations.Viaticos
 {
     [DbContext(typeof(ViaticosDbContext))]
-    partial class ViaticosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250501164914_VehiculoUpdate")]
+    partial class VehiculoUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,7 +271,7 @@ namespace Infrastructure.Migrations.Viaticos
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Placa")
+                    b.HasIndex("UsuarioAppId", "Placa")
                         .IsUnique();
 
                     b.ToTable("Vehiculos");

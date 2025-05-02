@@ -97,5 +97,10 @@ namespace Application.Services
         {
             return await _userRepository.ObtenerNombreCompletoAsync(usuarioAppId);
         }
+
+        public async Task<int> ObtenerIdPorNombreUsuario(string NombreUsuario)
+        {
+            return await _userRepository.ObtenerIdPorNombreUsuarioAsync(NombreUsuario);
+        }
     }
 }
