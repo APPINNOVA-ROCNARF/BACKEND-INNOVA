@@ -11,6 +11,7 @@ namespace Application.DTO.ViaticoDTO
     {
         public AccionViatico Accion { get; set; }
         public List<ActualizarViaticoItem> Viaticos { get; set; } = new();
+        public int UsuarioId { get; set; }
     }
 
     public class ActualizarViaticoItem

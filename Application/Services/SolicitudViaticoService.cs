@@ -46,7 +46,7 @@ namespace Application.Services
                     FechaRegistro = solicitud.FechaRegistro,
                     FechaModificacion = solicitud.FechaModificado,
                     Monto = solicitud.Monto,
-                    Estado = solicitud.Estado.ToFriendlyString()
+                    Estado = solicitud.Estado.ToString()
                 });
             }
 
@@ -66,7 +66,7 @@ namespace Application.Services
                 UsuarioNombre = nombreUsuario,
                 FechaRegistro = solicitud.FechaRegistro,
                 FechaModificacion = solicitud.FechaModificado,
-                Estado = solicitud.Estado.ToFriendlyString(),
+                Estado = solicitud.Estado.ToString(),
                 CicloNombre = nombreCiclo,
                 CicloId = solicitud.CicloId
             };

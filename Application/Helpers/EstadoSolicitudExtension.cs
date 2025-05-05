@@ -13,11 +13,11 @@ namespace Application.Helpers
         {
             return estado switch
             {
-                EstadoSolicitud.NoEnviada => "No enviada",
+                EstadoSolicitud.Borrador => "Borrador",
                 EstadoSolicitud.EnRevision => "En revisión",
                 EstadoSolicitud.Aprobado => "Aprobado",
                 EstadoSolicitud.Rechazado => "Rechazado",
-                EstadoSolicitud.ParaCorregir => "Para corregir",
+                EstadoSolicitud.Devuelto => "Devuelto",
                 _ => "Desconocido"
             };
         }

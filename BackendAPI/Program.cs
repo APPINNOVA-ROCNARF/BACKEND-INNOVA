@@ -1,3 +1,5 @@
+using Application.Audit;
+using Application.EventHandlers.Auditoria;
 using Application.Exceptions;
 using Application.Interfaces.IArchivo;
 using Application.Interfaces.IAuth;
@@ -11,9 +13,13 @@ using Application.Options;
 using Application.Services;
 using Application.Validators.Vehiculo;
 using Application.Validators.Viatico;
+using Domain.Common;
+using Domain.Events;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Audit;
 using Infrastructure.Data;
+using Infrastructure.Events;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +43,9 @@ builder.Services.AddDbContext<SistemaDbContext>(options =>
     options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information));
 
 builder.Services.AddDbContext<ViaticosDbContext>(options =>
+    options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information));
+
+builder.Services.AddDbContext<AuditoriaDbContext>(options =>
     options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information));
 
 // Configurar el Rate Limiter
@@ -117,6 +126,7 @@ builder.Services.AddScoped<IArchivoService, ArchivoService>();
 builder.Services.AddScoped<IViaticoService, ViaticoService>();
 builder.Services.AddScoped<ISolicitudViaticoService, SolicitudViaticoService>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();
+builder.Services.AddScoped<IAuditoriaService, AuditoriaService>();
 
 
 // Registrar repositorios
@@ -129,6 +139,12 @@ builder.Services.AddScoped<IViaticoRepository, ViaticoRepository>();
 builder.Services.AddScoped<IProveedorViaticoRepository, ProveedorViaticoRepository>();
 builder.Services.AddScoped<IVehiculoRepository, VehiculoRepository>();
 builder.Services.AddScoped<ISolicitudViaticoRepository, SolicitudViaticoRepository>();
+builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
+
+// Registrar eventos
+builder.Services.AddScoped<IDomainEventDispatcher, InMemoryDomainEventDispatcher>();
+builder.Services.AddScoped<IDomainEventHandler<EstadoViaticoCambiadoEvent>, EstadoViaticoCambiadoAuditoriaHandler>();
+
 
 
 //Unit of Work

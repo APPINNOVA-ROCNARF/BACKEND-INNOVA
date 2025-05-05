@@ -7,7 +7,9 @@ using Application.Interfaces.IArchivo;
 using Application.Interfaces.IUnitOfWork;
 using Application.Interfaces.IVehiculo;
 using Application.Interfaces.IViatico;
+using Domain.Common;
 using Domain.Entities.Viaticos;
+using Domain.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +26,7 @@ namespace Application.Services
         private readonly IArchivoRepository _archivoRepository;
         private readonly IProveedorViaticoRepository _proveedorRepository;
         private readonly IVehiculoRepository _vehiculoRepository;
+        private readonly IDomainEventDispatcher _eventDispatcher;
 
         public ViaticoService(
             IUnitOfWork unitOfWork,
@@ -31,7 +34,8 @@ namespace Application.Services
             ISolicitudViaticoRepository solicitudRepository,
             IArchivoRepository archivoRepository,
             IProveedorViaticoRepository proveedorRepository,
-            IVehiculoRepository vehiculoRepository)
+            IVehiculoRepository vehiculoRepository,
+            IDomainEventDispatcher eventDispatcher)
         {
             _unitOfWork = unitOfWork;
             _viaticoRepository = viaticoRepository;
@@ -39,6 +43,7 @@ namespace Application.Services
             _archivoRepository = archivoRepository;
             _proveedorRepository = proveedorRepository;
             _vehiculoRepository = vehiculoRepository;
+            _eventDispatcher=eventDispatcher;
         }
 
         public async Task<int> CrearViaticoAsync(ViaticoCrearDTO dto, string webRootPath)
@@ -69,20 +74,6 @@ namespace Application.Services
                     await _proveedorRepository.CrearAsync(proveedor);
                 }
 
-                /*if (!string.IsNullOrWhiteSpace(dto.PlacaVehiculo))
-                {
-                    var vehiculo = new Vehiculo
-                    {
-                        Placa = dto.PlacaVehiculo
-                    };
-
-                    if (!await _vehiculoRepository.ExistePorPlacaAsync(dto.PlacaVehiculo))
-                    {
-                        await _vehiculoRepository.CrearAsync(vehiculo);
-                    }
-                }
-                */
-
                 var solicitud = await _solicitudRepository.ObtenerPorCicloUsuarioAsync(dto.CicloId, dto.UsuarioAppId);
                 if (solicitud == null)
                 {
@@ -90,7 +81,7 @@ namespace Application.Services
                     {
                         CicloId = dto.CicloId,
                         UsuarioAppId = dto.UsuarioAppId,
-                        Estado = EstadoSolicitud.NoEnviada,
+                        Estado = EstadoSolicitud.Borrador,
                         Monto = 0
                     };
 
@@ -163,6 +154,8 @@ namespace Application.Services
 
             await _unitOfWork.BeginTransactionAsync();
 
+            var eventos = new List<IDomainEvent>();
+
             try
             {
                 var ids = request.Viaticos.Select(v => v.Id).ToList();
@@ -175,6 +168,8 @@ namespace Application.Services
                 {
                     ValidarEstadoActual(viatico, request.Accion);
 
+                    var estadoAnterior = viatico.EstadoViatico;
+
                     switch (request.Accion)
                     {
                         case AccionViatico.Aprobar:
@@ -185,6 +180,16 @@ namespace Application.Services
                             RechazarViatico(viatico, request);
                             break;
                     }
+
+                    if (estadoAnterior != viatico.EstadoViatico)
+                    {
+                        eventos.Add(new EstadoViaticoCambiadoEvent(
+                            viatico.Id,
+                            estadoAnterior,
+                            viatico.EstadoViatico,
+                            request.UsuarioId 
+                        ));
+                    }
                 }
 
                 await _viaticoRepository.ActualizarViaticosAsync(viaticos);
@@ -193,6 +198,9 @@ namespace Application.Services
                 await ActualizarEstadoSolicitudesAsync(solicitudesIds);
 
                 await _unitOfWork.CommitAsync();
+
+                foreach (var evento in eventos)
+                    await _eventDispatcher.Dispatch(evento);
             }
             catch
             {
