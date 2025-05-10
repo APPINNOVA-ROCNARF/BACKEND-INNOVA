@@ -80,6 +80,11 @@ namespace Infrastructure.Data
                 .HasMaxLength(5)
                 .IsRequired();
 
+
+            modelBuilder.Entity<UsuarioApp>()
+                .Property(um => um.SeccionId)
+                .IsRequired();
+
             modelBuilder.Entity<UsuarioAppSeccion>(entity =>
             {
                 entity.HasKey(us => new { us.UsuarioAppId, us.SeccionId });

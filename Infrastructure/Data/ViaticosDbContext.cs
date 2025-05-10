@@ -23,6 +23,7 @@ namespace Infrastructure.Data
         public DbSet<EstadisticaSolicitudViaticoDTO> EstadisticaSolicitudViatico { get; set; }
         public DbSet<VehiculoPrincipal> VehiculoPrincipal { get; set; }
         public DbSet<SolicitudVehiculoPrincipal> SolicitudVehiculoPrincipal { get; set; }
+        public DbSet<CupoMensual> CupoMensual { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -207,6 +208,25 @@ namespace Infrastructure.Data
                 entity.Property(s => s.FechaAprobacion)
                       .HasColumnType("timestamp without time zone")
                       .IsRequired(false);
+            });
+
+            modelBuilder.Entity<CupoMensual>(entity =>
+            {
+                entity.HasKey(c => c.Id);
+
+                entity.Property(c => c.Categoria)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(c => c.MontoAsignado)
+                      .HasColumnType("numeric(10,2)")
+                      .IsRequired();
+
+                entity.Property(c => c.FechaRegistro)
+                      .HasColumnType("timestamp without time zone");
+
+                entity.HasIndex(c => new { c.UsuarioId, c.CicloId, c.Categoria })
+                      .IsUnique();
             });
 
         }

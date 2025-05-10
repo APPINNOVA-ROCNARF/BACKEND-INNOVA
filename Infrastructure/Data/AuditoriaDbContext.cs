@@ -38,6 +38,18 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.Hash)
                     .HasMaxLength(256);
+
+                entity.Property(e => e.UsuarioNombre)
+                   .HasMaxLength(150);
+
+                entity.Property(e => e.IpCliente)
+                    .HasMaxLength(45); 
+
+                entity.Property(e => e.MetodoHttp)
+                    .HasMaxLength(10);
+
+                entity.Property(e => e.RutaAccedida)
+                    .HasMaxLength(300);
             });
         }
     }

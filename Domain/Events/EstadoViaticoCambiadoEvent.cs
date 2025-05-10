@@ -13,15 +13,13 @@ namespace Domain.Events
         public int ViaticoId { get; }
         public EstadoViatico EstadoAnterior { get; }
         public EstadoViatico EstadoNuevo { get; }
-        public int UsuarioId { get; }
         public DateTime FechaEvento { get; }
 
-        public EstadoViaticoCambiadoEvent(int viaticoId, EstadoViatico anterior, EstadoViatico nuevo, int usuarioId)
+        public EstadoViaticoCambiadoEvent(int viaticoId, EstadoViatico anterior, EstadoViatico nuevo)
         {
             ViaticoId = viaticoId;
             EstadoAnterior = anterior;
             EstadoNuevo = nuevo;
-            UsuarioId = usuarioId;
             FechaEvento = DateTime.UtcNow;
         }
     }

@@ -10,15 +10,16 @@ namespace Application.Helpers
 {
     class JwtClaimsHelper
     {
-        public static List<Claim> GenerateClaims(int userId, string email, string role)
+        public static List<Claim> GenerateClaims(int userId, string email, string role, string nombre)
         {
             return new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, email),
-            new Claim(ClaimTypes.Role, role),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+    {
+        new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+        new Claim(JwtRegisteredClaimNames.Email, email),
+        new Claim(ClaimTypes.Name, nombre), 
+        new Claim(ClaimTypes.Role, role),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
         }
     }
 }

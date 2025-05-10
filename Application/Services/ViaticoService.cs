@@ -186,8 +186,7 @@ namespace Application.Services
                         eventos.Add(new EstadoViaticoCambiadoEvent(
                             viatico.Id,
                             estadoAnterior,
-                            viatico.EstadoViatico,
-                            request.UsuarioId 
+                            viatico.EstadoViatico
                         ));
                     }
                 }
@@ -214,8 +213,14 @@ namespace Application.Services
             if (accion == AccionViatico.Aprobar && viatico.EstadoViatico == EstadoViatico.Aprobado)
                 throw new BusinessException($"El viático {viatico.Id} ya está aprobado.");
 
-            if (accion == AccionViatico.Rechazar && viatico.EstadoViatico == EstadoViatico.Rechazado)
-                throw new BusinessException($"El viático {viatico.Id} ya está rechazado.");
+            if (accion == AccionViatico.Rechazar)
+            {
+                if (viatico.EstadoViatico == EstadoViatico.Rechazado)
+                    throw new BusinessException($"El viático {viatico.Id} ya fue rechazado y no puede modificarse.");
+
+                if (viatico.EstadoViatico == EstadoViatico.Devuelto)
+                    throw new BusinessException($"El viático {viatico.Id} ya fue devuelto para corrección. Debe ser corregido por el usuario.");
+            }
         }
 
         private void AprobarViatico(Viatico viatico)
@@ -288,6 +293,32 @@ namespace Application.Services
             }
         }
 
+        public async Task EditarCamposFacturaAsync(int id, EditarViaticoDTO dto)
+        {
+            var viatico = await _viaticoRepository.GetIdPorFacturaAsync(id);
+            if (viatico == null)
+                throw new Exception("Viático no encontrado");
+
+            if (viatico.Factura is null)
+                throw new BusinessException("El viático no tiene una factura asociada");
+
+            if (!string.IsNullOrWhiteSpace(dto.NombreProveedor))
+                viatico.Factura.Proveedor.RazonSocial = dto.NombreProveedor;
+
+            if (!string.IsNullOrWhiteSpace(dto.NumeroFactura))
+                viatico.Factura.NumeroFactura = dto.NumeroFactura;
+
+            // Actualizar fecha viatico
+            _viaticoRepository.MarcarModificado(viatico);
+
+            // Actualizar fecha solicitud viatico
+            if (viatico.SolicitudViatico is not null)
+            {
+                _viaticoRepository.MarcarModificado(viatico.SolicitudViatico);
+            }
+
+            await _viaticoRepository.SaveChangesAsync();
+        }
     }
 
 }

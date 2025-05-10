@@ -2,6 +2,7 @@
 using Application.DTO.ViaticoDTO;
 using Application.Helpers;
 using Application.Interfaces.IViatico;
+using Domain.Common;
 using Domain.Entities.Viaticos;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +57,7 @@ namespace Infrastructure.Repositories
                 .Include(v => v.Categoria)
                 .Include(v => v.Vehiculo)
                 .Where(v => v.SolicitudViaticoId == solicitudId)
+                .OrderByDescending(v => v.FechaModificado)
                 .Select(v => new ViaticoListDTO
                 {
                     Id = v.Id,
@@ -91,6 +93,24 @@ namespace Infrastructure.Repositories
         public async Task ActualizarViaticosAsync(List<Viatico> viaticos)
         {
             _context.Viaticos.UpdateRange(viaticos);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Viatico?> GetIdPorFacturaAsync(int id)
+        {
+            return await _context.Viaticos
+                .Include(v => v.Factura)
+                    .ThenInclude(f => f.Proveedor)
+                .FirstOrDefaultAsync(v => v.Id == id);
+        }
+
+        public void MarcarModificado<T>(T entidad) where T : class, IModificado
+        {
+            _context.Entry(entidad).Property(e => e.FechaModificado).IsModified = true;
+        }
+
+        public async Task SaveChangesAsync()
+        {
             await _context.SaveChangesAsync();
         }
     }

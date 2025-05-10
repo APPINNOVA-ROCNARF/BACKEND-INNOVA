@@ -15,14 +15,14 @@ namespace Application.Services
             _configuration = configuration; 
         }
 
-        public string GenerateToken(int userId, string email, string role)
+        public string GenerateToken(int userId, string email, string role, string name)
         {
             var secretKey = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]);
             var issuer = _configuration["Jwt:Issuer"];
             var audience = _configuration["Jwt:Audience"];
             var expiration = Convert.ToInt32(_configuration["Jwt:ExpirationMinutes"]);
 
-            var claims = JwtClaimsHelper.GenerateClaims(userId, email, role);
+            var claims = JwtClaimsHelper.GenerateClaims(userId, email, role, name);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

@@ -24,7 +24,7 @@ namespace Application.Services
 
             string role = usuario.Rol.Nombre;
 
-            return _jwtService.GenerateToken(usuario.Id, usuario.Email, role);
+            return _jwtService.GenerateToken(usuario.Id, usuario.Email, role, usuario.Nombre);
 
         }
     }

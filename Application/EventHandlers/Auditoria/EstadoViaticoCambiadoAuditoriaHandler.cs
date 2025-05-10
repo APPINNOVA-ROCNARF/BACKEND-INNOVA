@@ -37,9 +37,8 @@ namespace Application.EventHandlers.Auditoria
                 tipoEvento: "CambioEstadoViatico",
                 datos: datos,
                 entidad: "Viatico",
-                entidadId: domainEvent.ViaticoId,
-                usuarioId: domainEvent.UsuarioId
-            );
+                entidadId: domainEvent.ViaticoId
+                );
 
             _logger.LogInformation("Auditoría registrada para cambio de estado del viático {Id}", domainEvent.ViaticoId);
         }

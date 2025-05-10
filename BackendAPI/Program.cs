@@ -73,6 +73,7 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<ViaticoCrearValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<ActualizarEstadoViaticoRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegistrarVehiculoDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<EditarViaticoDTOValidator>();
 
 
 builder.Services.AddControllers();
@@ -127,6 +128,7 @@ builder.Services.AddScoped<IViaticoService, ViaticoService>();
 builder.Services.AddScoped<ISolicitudViaticoService, SolicitudViaticoService>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();
 builder.Services.AddScoped<IAuditoriaService, AuditoriaService>();
+builder.Services.AddScoped<IUsuarioActualService, UsuarioActualService>();
 
 
 // Registrar repositorios
@@ -153,6 +155,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

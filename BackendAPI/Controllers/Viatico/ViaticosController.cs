@@ -85,5 +85,12 @@ namespace BackendAPI.Controllers.Viatico
             await _viaticoService.ActualizarEstadoViaticosAsync(request);
             return Ok(new { success = true, message = "Estado de viáticos actualizado correctamente." });
         }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> EditarCamposViatico(int id, [FromBody] EditarViaticoDTO dto)
+        {
+            await _viaticoService.EditarCamposFacturaAsync(id, dto);
+            return NoContent();
+        }
     }
 }

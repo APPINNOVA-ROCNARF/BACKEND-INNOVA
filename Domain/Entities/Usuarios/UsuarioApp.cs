@@ -14,6 +14,7 @@ namespace Domain.Entities.Usuarios
         public int UsuarioId { get; set; }
 
         public string NombreUsuario { get; set; }
+        public int SeccionId { get; set; }
         [JsonIgnore]
         public Usuario Usuario { get; set; }
         public ICollection<UsuarioAppSeccion> UsuarioSecciones { get; set;}
