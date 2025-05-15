@@ -11,5 +11,6 @@ namespace Application.Interfaces.ISistema
     {
         Task<List<CicloSelectDTO>> ObtenerCiclosSelectAsync();
         Task<string> ObtenerNombreCicloAsync(int cicloId);
+        Task<int?> ObtenerIdPorCodigoSeccionAsync(string codigo);
     }
 }

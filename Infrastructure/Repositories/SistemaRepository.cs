@@ -37,5 +37,13 @@ namespace Infrastructure.Repositories
 
             return ciclo?.Nombre ?? "Desconocido";
         }
+
+        public async Task<int?> ObtenerIdPorCodigoSeccionAsync(string codigo)
+        {
+            return await _context.Secciones
+                .Where(s => s.Codigo == codigo)
+                .Select(s => (int?)s.Id)
+                .FirstOrDefaultAsync();
+        }
     }
 }

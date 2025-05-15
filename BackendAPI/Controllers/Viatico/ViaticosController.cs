@@ -1,4 +1,6 @@
-﻿using Application.DTO.ViaticoDTO;
+﻿using Application.DTO.PresupuestoViaticoDTO;
+using Application.DTO.ViaticoDTO;
+using Application.Interfaces.IPresupuestoViatico;
 using Application.Interfaces.IViatico;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +12,14 @@ namespace BackendAPI.Controllers.Viatico
     {
         private readonly IViaticoService _viaticoService;
         private readonly ISolicitudViaticoService _solicitudViaticoService;
+        private readonly ICupoMensualService _cupoMensualService;
         private readonly IWebHostEnvironment _env;
 
-        public ViaticosController(IViaticoService viaticoService, ISolicitudViaticoService solicitudViaticoService, IWebHostEnvironment env)
+        public ViaticosController(IViaticoService viaticoService, ISolicitudViaticoService solicitudViaticoService, ICupoMensualService cupoMensualService, IWebHostEnvironment env)
         {
             _viaticoService = viaticoService;
             _solicitudViaticoService = solicitudViaticoService;
+            _cupoMensualService = cupoMensualService;
             _env = env;
         }
 
@@ -65,6 +69,17 @@ namespace BackendAPI.Controllers.Viatico
             return Ok(resultado);
         }
 
+        [HttpGet("estadistica-viatico/{solicitudId}")]
+        public async Task<IActionResult> GetDashboardDetalle(int solicitudId)
+        {
+            var resultado = await _viaticoService.ObtenerEstadisticaViaticoAsync(solicitudId);
+
+            if (resultado == null)
+                return NotFound("No se encontró información para la solicitud proporcionada.");
+
+            return Ok(resultado);
+        }
+
         [HttpGet("{solicitudId:int}")]
         public async Task<ActionResult<IEnumerable<ViaticoListDTO>>> GetViaticoPorSolicitud(int solicitudId)
         {
@@ -91,6 +106,43 @@ namespace BackendAPI.Controllers.Viatico
         {
             await _viaticoService.EditarCamposFacturaAsync(id, dto);
             return NoContent();
+        }
+
+        /// <summary>
+        /// Carga masiva de cupos mensuales por sección para un ciclo.
+        /// </summary>
+        /// <param name="sectores">Lista de cupos por sección</param>
+        /// <param name="cicloId">Id del ciclo al que se asignan los cupos</param>
+        /// <param name="cancellationToken">Token para cancelación</param>
+        [HttpPost("cargar-cupos")]
+        public async Task<IActionResult> CargarCupos(
+            [FromBody] List<CupoMensualDTO> sectores,
+            [FromQuery] int cicloId,
+            CancellationToken cancellationToken)
+        {
+            if (sectores == null || !sectores.Any())
+                return BadRequest("La lista de sectores está vacía o es nula.");
+
+            var (insertados, errores) = await _cupoMensualService
+                .CargarCuposDesdeSectoresAsync(sectores, cicloId, cancellationToken);
+
+            return Ok(new
+            {
+                mensaje = "Carga de cupos completada",
+                cuposInsertados = insertados,
+                sectoresNoEncontrados = errores
+            });
+        }
+
+        [HttpGet("verificar-cupos")]
+        public async Task<IActionResult> VerificarCarga([FromQuery] int cicloId)
+        {
+            if (cicloId <= 0)
+                return BadRequest("Debe proporcionar un ciclo válido.");
+
+            var existe = await _cupoMensualService.ExisteCargaParaCicloAsync(cicloId);
+
+            return existe ? Ok() : NoContent();
         }
     }
 }

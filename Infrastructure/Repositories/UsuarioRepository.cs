@@ -118,5 +118,14 @@ namespace Infrastructure.Repositories
 
             return usuarioApp.Id;
         }
+
+        public async Task<int?> ObtenerUsuarioIdPorSeccionIdAsync(int seccionId)
+        {
+            return await _context.UsuariosApp
+                .Where(u => u.SeccionId == seccionId)
+                .Select(u => (int?)u.Id)
+                .FirstOrDefaultAsync();
+        }
     }
+
 }

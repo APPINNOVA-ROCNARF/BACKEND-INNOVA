@@ -12,6 +12,7 @@ namespace Application.Interfaces.IViatico
         Task<int> CrearViaticoAsync(ViaticoCrearDTO dto, string webRootPath);
 
         Task<EstadisticaSolicitudViaticoDTO> ObtenerEstadisticaSolicitudViaticoAsync(int cicloId);
+        Task<List<EstadisticaViaticoDTO>> ObtenerEstadisticaViaticoAsync(int solicitudId);
         Task<IEnumerable<ViaticoListDTO>> ObtenerViaticosPorSolicitudAsync(int solicitudId);
         Task ActualizarEstadoViaticosAsync(ActualizarEstadoViaticoRequest request);
         Task EditarCamposFacturaAsync(int id, EditarViaticoDTO dto);

@@ -32,5 +32,7 @@ namespace Application.Interfaces.IUsuario
         Task<string> ObtenerNombreCompletoAsync(int usuarioAppId);
         // Obtener Id por Nombre de Usuario
         Task<int> ObtenerIdPorNombreUsuarioAsync(string nombreUsuario);
+        Task<int?> ObtenerUsuarioIdPorSeccionIdAsync(int seccionId);
+
     }
 }

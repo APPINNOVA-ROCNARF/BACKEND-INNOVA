@@ -3,6 +3,7 @@ using Application.EventHandlers.Auditoria;
 using Application.Exceptions;
 using Application.Interfaces.IArchivo;
 using Application.Interfaces.IAuth;
+using Application.Interfaces.IPresupuestoViatico;
 using Application.Interfaces.IRol;
 using Application.Interfaces.ISistema;
 using Application.Interfaces.IUnitOfWork;
@@ -129,6 +130,7 @@ builder.Services.AddScoped<ISolicitudViaticoService, SolicitudViaticoService>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();
 builder.Services.AddScoped<IAuditoriaService, AuditoriaService>();
 builder.Services.AddScoped<IUsuarioActualService, UsuarioActualService>();
+builder.Services.AddScoped<ICupoMensualService, CupoMensualService>();
 
 
 // Registrar repositorios
@@ -142,6 +144,7 @@ builder.Services.AddScoped<IProveedorViaticoRepository, ProveedorViaticoReposito
 builder.Services.AddScoped<IVehiculoRepository, VehiculoRepository>();
 builder.Services.AddScoped<ISolicitudViaticoRepository, SolicitudViaticoRepository>();
 builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
+builder.Services.AddScoped<ICupoMensualRepository, CupoMensualRepository>();
 
 // Registrar eventos
 builder.Services.AddScoped<IDomainEventDispatcher, InMemoryDomainEventDispatcher>();

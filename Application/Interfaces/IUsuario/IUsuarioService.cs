@@ -32,5 +32,7 @@ namespace Application.Interfaces.IUsuario
         // Método para obtener Id por Nombre Usuario
         Task<int> ObtenerIdPorNombreUsuario(string NombreUsuario);
 
+        Task<int?> ObtenerUsuarioIdPorSeccionIdAsync(int seccionId);
+
     }
 }

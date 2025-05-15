@@ -25,7 +25,6 @@ namespace Application.Services
         private readonly ISolicitudViaticoRepository _solicitudRepository;
         private readonly IArchivoRepository _archivoRepository;
         private readonly IProveedorViaticoRepository _proveedorRepository;
-        private readonly IVehiculoRepository _vehiculoRepository;
         private readonly IDomainEventDispatcher _eventDispatcher;
 
         public ViaticoService(
@@ -34,7 +33,6 @@ namespace Application.Services
             ISolicitudViaticoRepository solicitudRepository,
             IArchivoRepository archivoRepository,
             IProveedorViaticoRepository proveedorRepository,
-            IVehiculoRepository vehiculoRepository,
             IDomainEventDispatcher eventDispatcher)
         {
             _unitOfWork = unitOfWork;
@@ -42,7 +40,6 @@ namespace Application.Services
             _solicitudRepository = solicitudRepository;
             _archivoRepository = archivoRepository;
             _proveedorRepository = proveedorRepository;
-            _vehiculoRepository = vehiculoRepository;
             _eventDispatcher=eventDispatcher;
         }
 
@@ -142,6 +139,11 @@ namespace Application.Services
             return await _viaticoRepository.ObtenerEstadisticaSolicitudViaticoAsync(cicloId);
         }
 
+        public async Task<List<EstadisticaViaticoDTO>> ObtenerEstadisticaViaticoAsync(int solicitudId)
+        {
+            return await _viaticoRepository.ObtenerEstadisticaViaticoAsync(solicitudId);
+        }
+
         public async Task<IEnumerable<ViaticoListDTO>> ObtenerViaticosPorSolicitudAsync(int solicitudId)
         {
             return await _viaticoRepository.ObtenerViaticosPorSolicitudAsync(solicitudId);
@@ -217,9 +219,6 @@ namespace Application.Services
             {
                 if (viatico.EstadoViatico == EstadoViatico.Rechazado)
                     throw new BusinessException($"El viático {viatico.Id} ya fue rechazado y no puede modificarse.");
-
-                if (viatico.EstadoViatico == EstadoViatico.Devuelto)
-                    throw new BusinessException($"El viático {viatico.Id} ya fue devuelto para corrección. Debe ser corregido por el usuario.");
             }
         }
 
@@ -232,38 +231,42 @@ namespace Application.Services
 
         private void RechazarViatico(Viatico viatico, ActualizarEstadoViaticoRequest request)
         {
-            viatico.EstadoViatico = EstadoViatico.Rechazado;
+            var viaticoRequest = request.Viaticos.FirstOrDefault(v => v.Id == viatico.Id);
 
-            if (request.Viaticos.Count > 1)
+            if (viaticoRequest != null)
             {
-                // Rechazo masivo
-                viatico.Comentario = "Viático inválido";
-                viatico.CamposRechazados = null;
-            }
-            else
-            {
-                // Rechazo individual
-                var viaticoRequest = request.Viaticos.FirstOrDefault(v => v.Id == viatico.Id);
+                var camposRechazados = viaticoRequest.CamposRechazados?.Where(c => !string.IsNullOrWhiteSpace(c.Campo)).ToList();
 
-                if (viaticoRequest != null)
+                if (camposRechazados != null && camposRechazados.Count > 0)
                 {
-                    viatico.Comentario = string.IsNullOrWhiteSpace(viaticoRequest.Comentario)
-                        ? "Viático inválido"
-                        : viaticoRequest.Comentario;
-
-                    viatico.CamposRechazados = viaticoRequest.CamposRechazados?.Select(c => new CampoRechazado
+                    viatico.EstadoViatico = EstadoViatico.Devuelto;
+                    viatico.CamposRechazados = camposRechazados.Select(c => new CampoRechazado
                     {
                         Campo = c.Campo,
                         Comentario = c.Comentario
                     }).ToList();
+
+                    viatico.Comentario = string.IsNullOrWhiteSpace(viaticoRequest.Comentario)
+                        ? "Viático devuelto para corrección"
+                        : viaticoRequest.Comentario;
                 }
                 else
                 {
-                    viatico.Comentario = "Viático inválido";
+                    viatico.EstadoViatico = EstadoViatico.Rechazado;
                     viatico.CamposRechazados = null;
+                    viatico.Comentario = string.IsNullOrWhiteSpace(viaticoRequest.Comentario)
+                        ? "Viático rechazado"
+                        : viaticoRequest.Comentario;
                 }
             }
+            else
+            {
+                viatico.EstadoViatico = EstadoViatico.Rechazado;
+                viatico.Comentario = "Viático rechazado";
+                viatico.CamposRechazados = null;
+            }
         }
+
 
         private async Task ActualizarEstadoSolicitudesAsync(List<int> solicitudesIds)
         {

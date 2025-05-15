@@ -102,5 +102,11 @@ namespace Application.Services
         {
             return await _userRepository.ObtenerIdPorNombreUsuarioAsync(NombreUsuario);
         }
+
+        public async Task<int?> ObtenerUsuarioIdPorSeccionIdAsync(int seccionId)
+        {
+            return await _userRepository.ObtenerUsuarioIdPorSeccionIdAsync(seccionId);
+        }
+
     }
 }

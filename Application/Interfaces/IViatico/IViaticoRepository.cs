@@ -13,6 +13,7 @@ namespace Application.Interfaces.IViatico
     {
         Task<int> CrearViaticoAsync(CrearViaticoDTO dto);
         Task<EstadisticaSolicitudViaticoDTO?> ObtenerEstadisticaSolicitudViaticoAsync(int cicloId);
+        Task<List<EstadisticaViaticoDTO>> ObtenerEstadisticaViaticoAsync(int solicitudId);
         Task<IEnumerable<ViaticoListDTO>> ObtenerViaticosPorSolicitudAsync(int solicitudId);
         Task<List<Viatico>> ObtenerViaticosPorIdsAsync(List<int> ids);
         Task ActualizarViaticosAsync(List<Viatico> viaticos);

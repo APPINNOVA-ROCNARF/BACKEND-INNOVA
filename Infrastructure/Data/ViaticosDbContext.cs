@@ -21,6 +21,7 @@ namespace Infrastructure.Data
         public DbSet<ProveedorViatico> ProveedoresViatico { get; set; }
         public DbSet<Vehiculo> Vehiculos { get; set; }
         public DbSet<EstadisticaSolicitudViaticoDTO> EstadisticaSolicitudViatico { get; set; }
+        public DbSet<EstadisticaViaticoDTO> EstadisticaViatico { get; set; }
         public DbSet<VehiculoPrincipal> VehiculoPrincipal { get; set; }
         public DbSet<SolicitudVehiculoPrincipal> SolicitudVehiculoPrincipal { get; set; }
         public DbSet<CupoMensual> CupoMensual { get; set; }
@@ -29,6 +30,8 @@ namespace Infrastructure.Data
         {
 
             modelBuilder.Entity<EstadisticaSolicitudViaticoDTO>().HasNoKey().ToView(null);
+
+            modelBuilder.Entity<EstadisticaViaticoDTO>().HasNoKey().ToView(null);
 
             // SOLICITUD VIATICO
             modelBuilder.Entity<SolicitudViatico>(entity =>

@@ -49,6 +49,15 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<List<EstadisticaViaticoDTO>> ObtenerEstadisticaViaticoAsync(int solicitudId)
+        {
+            var sql = "SELECT * FROM obtener_resumen_viaticos_por_categoria({0})";
+            return await _context.Set<EstadisticaViaticoDTO>()
+                .FromSqlRaw(sql, solicitudId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<ViaticoListDTO>> ObtenerViaticosPorSolicitudAsync(int solicitudId)
         {
             return await _context.Viaticos
