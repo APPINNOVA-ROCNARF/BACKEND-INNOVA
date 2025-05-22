@@ -17,9 +17,8 @@ namespace Domain.Entities.Viaticos
         public SolicitudViatico SolicitudViatico { get; set; }
         public int CategoriaId { get; set; }
         public CategoriaViatico? Categoria { get; set; }
-
-        public int? FacturaId { get; set; }
-        public FacturaViatico? Factura { get; set; }
+        public int? SubcategoriaId { get; set; }
+        public SubcategoriaViatico Subcategoria { get; set; }
         public int? VehiculoId { get; set; }
         public Vehiculo? Vehiculo { get; set; }
         public EstadoViatico EstadoViatico { get; set; }
@@ -27,5 +26,6 @@ namespace Domain.Entities.Viaticos
 
         public List<CampoRechazado>? CamposRechazados { get; set; }
         public decimal Monto { get; set; }
+        public ICollection<RelacionViaticoFactura> RelacionViaticoFacturas { get; set; }
     }
 }

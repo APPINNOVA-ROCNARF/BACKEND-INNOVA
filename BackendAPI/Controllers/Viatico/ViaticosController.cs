@@ -1,4 +1,5 @@
-﻿using Application.DTO.PresupuestoViaticoDTO;
+﻿using Application.Audit;
+using Application.DTO.PresupuestoViaticoDTO;
 using Application.DTO.ViaticoDTO;
 using Application.Interfaces.IPresupuestoViatico;
 using Application.Interfaces.IViatico;
@@ -13,20 +14,22 @@ namespace BackendAPI.Controllers.Viatico
         private readonly IViaticoService _viaticoService;
         private readonly ISolicitudViaticoService _solicitudViaticoService;
         private readonly ICupoMensualService _cupoMensualService;
+        private readonly IAuditoriaService _auditoriaService;
         private readonly IWebHostEnvironment _env;
 
-        public ViaticosController(IViaticoService viaticoService, ISolicitudViaticoService solicitudViaticoService, ICupoMensualService cupoMensualService, IWebHostEnvironment env)
+        public ViaticosController(IViaticoService viaticoService, ISolicitudViaticoService solicitudViaticoService, ICupoMensualService cupoMensualService, IAuditoriaService auditoriaService, IWebHostEnvironment env)
         {
             _viaticoService = viaticoService;
             _solicitudViaticoService = solicitudViaticoService;
             _cupoMensualService = cupoMensualService;
+            _auditoriaService = auditoriaService;
             _env = env;
         }
 
         [HttpPost]
         public async Task<IActionResult> CrearViatico([FromBody] ViaticoCrearDTO dto)
         {
-            if (dto == null || dto.Factura == null)
+            if (dto == null || dto.Facturas == null)
                 return BadRequest("Datos incompletos.");
 
             try
@@ -101,11 +104,11 @@ namespace BackendAPI.Controllers.Viatico
             return Ok(new { success = true, message = "Estado de viáticos actualizado correctamente." });
         }
 
-        [HttpPatch("{id}")]
-        public async Task<IActionResult> EditarCamposViatico(int id, [FromBody] EditarViaticoDTO dto)
+        [HttpPatch("{facturaId}")]
+        public async Task<IActionResult> EditarCamposViatico(int facturaId, [FromBody] EditarViaticoDTO dto)
         {
-            await _viaticoService.EditarCamposFacturaAsync(id, dto);
-            return NoContent();
+            await _viaticoService.EditarCamposFacturaAsync(facturaId, dto);
+            return Ok();
         }
 
         /// <summary>
@@ -143,6 +146,37 @@ namespace BackendAPI.Controllers.Viatico
             var existe = await _cupoMensualService.ExisteCargaParaCicloAsync(cicloId);
 
             return existe ? Ok() : NoContent();
+        }
+
+        [HttpGet("historial")]
+        public async Task<IActionResult> ObtenerHistorial([FromQuery] int viaticoId)
+        {
+            var historial = await _viaticoService.ObtenerHistorialViaticoAsync(viaticoId);
+            return Ok(historial);
+        }
+
+        [HttpGet("reporte")]
+        public async Task<ActionResult<List<ViaticoReporteDTO>>> GetResumenPorCategoria(
+    [FromQuery] int? cicloId,
+    [FromQuery] DateTime? fechaInicio,
+    [FromQuery] DateTime? fechaFin)
+        {
+            if (!cicloId.HasValue && (!fechaInicio.HasValue || !fechaFin.HasValue))
+            {
+                return BadRequest("Debe especificar cicloId o un rango de fechas (fechaInicio y fechaFin).");
+            }
+
+            var resultado = await _viaticoService.ObtenerResumenPorCategoriaAsync(cicloId, fechaInicio, fechaFin);
+            return Ok(resultado);
+        }
+
+        [HttpGet("exportar-excel")]
+        public async Task<IActionResult> ExportarExcel([FromQuery] int? cicloId, [FromQuery] DateTime? fechaInicio, [FromQuery] DateTime? fechaFin)
+        {
+            var excelBytes = await _viaticoService.GenerarExcelAsync(cicloId, fechaInicio, fechaFin);
+            return File(excelBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "resumen_viaticos.xlsx");
         }
     }
 }

@@ -149,6 +149,7 @@ builder.Services.AddScoped<ICupoMensualRepository, CupoMensualRepository>();
 // Registrar eventos
 builder.Services.AddScoped<IDomainEventDispatcher, InMemoryDomainEventDispatcher>();
 builder.Services.AddScoped<IDomainEventHandler<EstadoViaticoCambiadoEvent>, EstadoViaticoCambiadoAuditoriaHandler>();
+builder.Services.AddScoped<IDomainEventHandler<FacturaEditadaEvent>, FacturaEditadaAuditoriaHandler>();
 
 
 

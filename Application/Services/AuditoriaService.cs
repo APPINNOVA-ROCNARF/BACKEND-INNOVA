@@ -1,6 +1,7 @@
 ﻿using Application.Audit;
 using Application.Interfaces.IUsuario;
 using Domain.Entities.Auditoria;
+using Domain.Entities.Usuarios;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -28,53 +29,54 @@ namespace Application.Services
             _logger = logger;
         }
 
-        public async Task RegistrarEventoAsync(
-            string tipoEvento,
-            object datos,
-            string? entidad = null,
-            int? entidadId = null,
-            int? usuarioId = null)
+        public async Task RegistrarEventoAsync(AuditoriaEventoDTO evento)
         {
-            var usuario = _usuarioActual.Obtener();
-            var context = _http.HttpContext;
-
-            var datosJson = JsonSerializer.Serialize(datos);
-            var ip = context?.Connection?.RemoteIpAddress?.ToString();
-            var metodo = context?.Request?.Method;
-            var ruta = context?.Request?.Path.Value;
-
-            var hash = CalcularHash(
-                tipoEvento,
-                DateTime.UtcNow.ToString("O"),
-                entidad ?? "",
-                entidadId?.ToString() ?? "",
-                usuario.Id.ToString(),
-                usuario.Nombre,
-                datosJson,
-                ip ?? "",
-                metodo ?? "",
-                ruta ?? ""
-            );
-
-            var registro = new AuditoriaRegistro
+            try
             {
-                TipoEvento = tipoEvento,
-                Fecha = DateTime.UtcNow,
-                Datos = datosJson,
-                EntidadAfectada = entidad,
-                EntidadId = entidadId,
-                UsuarioId = usuario.Id,
-                UsuarioNombre = usuario.Nombre,
-                IpCliente = ip,
-                MetodoHttp = metodo,
-                RutaAccedida = ruta,
-                Hash = hash
-            };
+                var usuario = _usuarioActual.Obtener();
+                var context = _http.HttpContext;
 
-            await _repository.AgregarAsync(registro);
+                var datosJson = JsonSerializer.Serialize(evento.Datos);
+                var ip = context?.Connection?.RemoteIpAddress?.ToString();
+                var metodo = context?.Request?.Method;
+                var ruta = context?.Request?.Path.Value;
 
-            _logger.LogInformation("Auditoría registrada | Evento: {Evento} | Entidad: {Entidad} | ID: {EntidadId} | Usuario: {Usuario}",
-                tipoEvento, entidad, entidadId, usuario.Nombre);
+                var hash = CalcularHash(
+                    evento.TipoEvento,
+                    DateTime.Now.ToString("O"),
+                    evento.Entidad ?? "",
+                    evento.EntidadId?.ToString() ?? "",
+                    usuario.Id.ToString(),
+                    usuario.Nombre,
+                    datosJson,
+                    ip ?? "",
+                    metodo ?? "",
+                ruta ?? ""
+                );
+
+                var auditoria = CrearInstanciaAuditoria(evento.Modulo);
+                auditoria.TipoEvento = evento.TipoEvento;
+                auditoria.Fecha = DateTime.Now;
+                auditoria.Datos = datosJson;
+                auditoria.EntidadAfectada = evento.Entidad;
+                auditoria.EntidadId = evento.EntidadId;
+                auditoria.UsuarioId = usuario.Id;
+                auditoria.UsuarioNombre = usuario.Nombre;
+                auditoria.IpCliente = ip;
+                auditoria.MetodoHttp = metodo;
+                auditoria.RutaAccedida = ruta;
+                auditoria.Hash = hash;
+
+                await _repository.AgregarAsync(auditoria, evento.Modulo);
+
+                _logger.LogInformation("Auditoría registrada | Evento: {Evento} | Entidad: {Entidad} | ID: {EntidadId} | Usuario: {Usuario}",
+                    evento.TipoEvento, evento.Entidad, evento.EntidadId, usuario.Nombre);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "No se pudo registrar evento de auditoría para el módulo '{Modulo}'", evento.Modulo);
+
+            }
         }
 
         private string CalcularHash(params string[] valores)
@@ -84,6 +86,15 @@ namespace Application.Services
             var bytes = Encoding.UTF8.GetBytes(textoPlano);
             var hashBytes = sha256.ComputeHash(bytes);
             return Convert.ToBase64String(hashBytes);
+        }
+
+        private AuditoriaBase CrearInstanciaAuditoria(string modulo)
+        {
+            return modulo.ToLowerInvariant() switch
+            {
+                "viaticos" => new AuditoriaViaticos(),
+                _ => throw new ArgumentException($"Módulo de auditoría no soportado: {modulo}")
+            };
         }
     }
 }

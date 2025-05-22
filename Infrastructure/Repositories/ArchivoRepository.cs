@@ -33,7 +33,7 @@ namespace Infrastructure.Repositories
             if (archivoDto.Contenido.Length > _opciones.MaximoMB * 1024 * 1024)
                 throw new InvalidOperationException("Archivo excede el tamaño máximo permitido.");
 
-            var fecha = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            var fecha = DateTime.Now.ToString("yyyy-MM-dd");
             var nombreFinal = Guid.NewGuid() + extension;
 
             var rutaRelativa = Path.Combine(_opciones.RutaBase, "temp", fecha, nombreFinal).Replace("\\", "/");
@@ -43,6 +43,27 @@ namespace Infrastructure.Repositories
             await File.WriteAllBytesAsync(rutaCompleta, archivoDto.Contenido);
 
             return rutaRelativa;
+        }
+
+        public async Task<List<ArchivoTemporalGuardadoDTO>> GuardarArchivosTempAsync(
+            List<ArchivoUploadDTO> archivosDto,
+            string webRootPath)
+        {
+            var archivosGuardados = new List<ArchivoTemporalGuardadoDTO>();
+
+            foreach (var archivoDto in archivosDto)
+            {
+                var rutaRelativa = await GuardarArchivoTempAsync(archivoDto, webRootPath);
+
+                archivosGuardados.Add(new ArchivoTemporalGuardadoDTO
+                {
+                    NombreOriginal = archivoDto.Nombre,
+                    RutaTemporal = rutaRelativa,
+                    Extension = archivoDto.Extension
+                });
+            }
+
+            return archivosGuardados;
         }
 
         public async Task<string> MoverArchivoFinalAsync(MoverArchivoDTO dto, string webRootPath)
@@ -72,6 +93,40 @@ namespace Infrastructure.Repositories
 
             return rutaRelativaFinal;
         }
+
+        public async Task<List<string>> MoverArchivosAGuiaProductoAsync(List<MoverArchivoGuiaDTO> archivos, int guiaProductoId, string webRootPath)
+        {
+            var rutasFinales = new List<string>();
+
+            foreach (var archivo in archivos)
+            {
+                var rutaTemporalCompleta = Path.Combine(webRootPath, archivo.RutaTemporal);
+
+                if (!File.Exists(rutaTemporalCompleta))
+                    throw new FileNotFoundException("Archivo no encontrado: " + archivo.RutaTemporal);
+
+                var extension = Path.GetExtension(archivo.RutaTemporal);
+                var nombreFinal = $"{archivo.NombreOriginal}_{Guid.NewGuid()}{extension}";
+
+                var rutaRelativaFinal = Path.Combine(
+                    _opciones.RutaBase,
+                    "guias-producto",
+                    guiaProductoId.ToString(),
+                    nombreFinal
+                ).Replace("\\", "/");
+
+                var rutaFinalCompleta = Path.Combine(webRootPath, rutaRelativaFinal);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(rutaFinalCompleta)!);
+                File.Move(rutaTemporalCompleta, rutaFinalCompleta);
+
+                rutasFinales.Add(rutaRelativaFinal);
+            }
+
+            return rutasFinales;
+        }
+
+
 
 
     }

@@ -11,9 +11,10 @@ namespace Application.DTO.ViaticoDTO
         public int UsuarioAppId { get; set; }     
         public int CicloId { get; set; }         
         public int CategoriaId { get; set; }
+        public int? SubcategoriaId { get; set; }
         public int? VehiculoId { get; set; }
 
         public string? Comentario { get; set; }      
-        public FacturaCrearDTO Factura { get; set; }  
+        public List<FacturaCrearDTO> Facturas { get; set; }  
     }
 }

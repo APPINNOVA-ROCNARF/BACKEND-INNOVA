@@ -20,5 +20,6 @@ namespace Domain.Entities.Viaticos
         public int? AprobadoPorUsuarioId { get; set; } 
         public DateTime? FechaAprobacion { get; set; }
         public EstadoSolicitudVehiculo Estado { get; set; }
+        public Vehiculo? Vehiculo { get; set; }
     }
 }

@@ -13,5 +13,6 @@ namespace Domain.Entities.Viaticos
         public bool Estado { get; set; } = true;               
 
         public ICollection<Viatico>? Viaticos { get; set; }    
+        public ICollection<SubcategoriaViatico> Subcategorias { get; set; }
     }
 }

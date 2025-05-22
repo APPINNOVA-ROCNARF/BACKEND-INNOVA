@@ -9,6 +9,7 @@ namespace Application.Audit
 {
     public interface IAuditoriaRepository
     {
-        Task AgregarAsync(AuditoriaRegistro registro);
+        Task AgregarAsync(AuditoriaBase auditoria, string modulo);
+        Task<IList<HistorialAuditoriaDTO>> ObtenerHistorialAsync(string entidad, int entidadId);
     }
 }

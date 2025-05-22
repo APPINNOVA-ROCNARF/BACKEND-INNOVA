@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Common;
 using Domain.Entities.Sistema;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,8 @@ namespace Infrastructure.Data
         public DbSet<Region> Regiones { get; set; }
         public DbSet<Fuerza> Fuerzas { get; set; }
         public DbSet<Seccion> Secciones { get; set; }
+        public DbSet<GuiaProducto> GuiasProducto { get; set; }
+        public DbSet<ArchivoGuiaProducto> ArchivoGuiaProducto { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -92,6 +95,100 @@ namespace Infrastructure.Data
                 new Fuerza { Id = 3, Codigo = "F3", Nombre = "F3" },
                 new Fuerza { Id = 4, Codigo = "F4", Nombre = "F4" }
             );
+
+            // GUIA PRODUCTO
+
+            modelBuilder.Entity<GuiaProducto>(entity =>
+            {
+                entity.HasKey(g => g.Id);
+
+                entity.Property(g => g.Marca)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                entity.Property(g => g.Nombre)
+                      .HasMaxLength(150)
+                      .IsRequired();
+
+                entity.Property(g => g.UrlVideo)
+                      .HasMaxLength(500)
+                      .IsRequired();
+
+                entity.Property(g => g.Activo)
+                      .IsRequired();
+
+                entity.Property(g => g.FechaRegistro)
+                      .HasColumnType("timestamp without time zone")
+                      .IsRequired();
+
+                entity.HasOne(g => g.Fuerza)
+                      .WithMany(f => f.GuiasProducto)
+                      .HasForeignKey(g => g.FuerzaId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ARCHIVO GUIA PRODUCTO
+            modelBuilder.Entity<ArchivoGuiaProducto>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+
+                entity.Property(a => a.NombreOriginal)
+                      .HasMaxLength(255)
+                      .IsRequired();
+
+                entity.Property(a => a.RutaRelativa)
+                      .HasMaxLength(500)
+                      .IsRequired();
+
+                entity.Property(a => a.Extension)
+                      .HasMaxLength(10)
+                      .IsRequired();
+
+                entity.Property(a => a.Activo)
+                      .IsRequired();
+
+                entity.Property(a => a.FechaRegistro)
+                      .HasColumnType("timestamp without time zone")
+                      .IsRequired();
+
+                entity.HasOne(a => a.GuiaProducto)
+                      .WithMany(g => g.Archivos)
+                      .HasForeignKey(a => a.GuiaProductoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
+        public override int SaveChanges()
+        {
+            AuditarFechas();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            AuditarFechas();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void AuditarFechas()
+        {
+            var now = DateTime.Now;
+
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.Entity is ICreado creado && entry.State == EntityState.Added)
+                {
+                    creado.FechaRegistro = now;
+                }
+
+                if (entry.Entity is IModificado modificado &&
+                    (entry.State == EntityState.Added || entry.State == EntityState.Modified))
+                {
+                    modificado.FechaModificado = now;
+                }
+            }
         }
     }
+
+
 }

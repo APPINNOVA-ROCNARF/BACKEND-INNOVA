@@ -11,6 +11,9 @@ namespace Application.Interfaces.IArchivo
     {
         Task<string> GuardarArchivoTempAsync(ArchivoUploadDTO archivoDto, string webRootPath);
         Task<string> MoverArchivoFinalAsync(MoverArchivoDTO dto, string webRootPath);
-
+        Task<List<string>> MoverArchivosAGuiaProductoAsync(
+    List<MoverArchivoGuiaDTO> archivos,
+    int guiaProductoId,
+    string webRootPath);
     }
 }

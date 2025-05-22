@@ -22,6 +22,45 @@ namespace Infrastructure.Migrations.Sistema
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.Entities.Sistema.ArchivoGuiaProducto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("GuiaProductoId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NombreOriginal")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("RutaRelativa")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuiaProductoId");
+
+                    b.ToTable("ArchivosGuiaProducto");
+                });
+
             modelBuilder.Entity("Domain.Entities.Sistema.Ciclo", b =>
                 {
                     b.Property<int>("Id")
@@ -98,6 +137,45 @@ namespace Infrastructure.Migrations.Sistema
                         });
                 });
 
+            modelBuilder.Entity("Domain.Entities.Sistema.GuiaProducto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("FuerzaId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Marca")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("UrlVideo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FuerzaId");
+
+                    b.ToTable("GuiasProducto");
+                });
+
             modelBuilder.Entity("Domain.Entities.Sistema.Region", b =>
                 {
                     b.Property<int>("Id")
@@ -161,6 +239,28 @@ namespace Infrastructure.Migrations.Sistema
                     b.ToTable("Secciones");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Sistema.ArchivoGuiaProducto", b =>
+                {
+                    b.HasOne("Domain.Entities.Sistema.GuiaProducto", "GuiaProducto")
+                        .WithMany("Archivos")
+                        .HasForeignKey("GuiaProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GuiaProducto");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Sistema.GuiaProducto", b =>
+                {
+                    b.HasOne("Domain.Entities.Sistema.Fuerza", "Fuerza")
+                        .WithMany("GuiasProducto")
+                        .HasForeignKey("FuerzaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Fuerza");
+                });
+
             modelBuilder.Entity("Domain.Entities.Sistema.Seccion", b =>
                 {
                     b.HasOne("Domain.Entities.Sistema.Fuerza", "Fuerza")
@@ -182,7 +282,14 @@ namespace Infrastructure.Migrations.Sistema
 
             modelBuilder.Entity("Domain.Entities.Sistema.Fuerza", b =>
                 {
+                    b.Navigation("GuiasProducto");
+
                     b.Navigation("Secciones");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Sistema.GuiaProducto", b =>
+                {
+                    b.Navigation("Archivos");
                 });
 
             modelBuilder.Entity("Domain.Entities.Sistema.Region", b =>

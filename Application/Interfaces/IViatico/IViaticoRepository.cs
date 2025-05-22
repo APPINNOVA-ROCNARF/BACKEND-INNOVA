@@ -17,8 +17,12 @@ namespace Application.Interfaces.IViatico
         Task<IEnumerable<ViaticoListDTO>> ObtenerViaticosPorSolicitudAsync(int solicitudId);
         Task<List<Viatico>> ObtenerViaticosPorIdsAsync(List<int> ids);
         Task ActualizarViaticosAsync(List<Viatico> viaticos);
-        Task<Viatico?> GetIdPorFacturaAsync(int id);
+        Task<RelacionViaticoFactura?> ObtenerRelacionConFacturaYViaticoAsync(int facturaId);
         void MarcarModificado<T>(T entidad) where T : class, IModificado;
+        Task<SubcategoriaViatico?> ObtenerPorIdAsync(int? id);
         Task SaveChangesAsync();
+        Task<List<int>> ObtenerIdsFacturasPorViaticoAsync(int viaticoId);
+        Task<List<Viatico>> ObtenerConSolicitudYCategoriaPorFiltroAsync(int? cicloId, DateTime? fechaInicio, DateTime? fechaFin);
+        Task<List<CupoMensual>> ObtenerCuposMensualesAsync(List<int> usuarioIds, List<int> ciclosIds);
     }
 }

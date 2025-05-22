@@ -13,6 +13,7 @@ namespace Domain.Entities.Sistema
         public string Nombre { get; set; }       
 
         public ICollection<Seccion> Secciones { get; set; }
+        public ICollection<GuiaProducto> GuiasProducto { get; set; } = new List<GuiaProducto>();
     }
 
 }

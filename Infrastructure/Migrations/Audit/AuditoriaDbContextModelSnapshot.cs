@@ -22,7 +22,7 @@ namespace Infrastructure.Migrations.Audit
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.Auditoria.AuditoriaRegistro", b =>
+            modelBuilder.Entity("Domain.Entities.Auditoria.AuditoriaViaticos", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -74,7 +74,7 @@ namespace Infrastructure.Migrations.Audit
 
                     b.HasKey("Id");
 
-                    b.ToTable("Auditorias");
+                    b.ToTable("AuditoriaViaticos", (string)null);
                 });
 #pragma warning restore 612, 618
         }

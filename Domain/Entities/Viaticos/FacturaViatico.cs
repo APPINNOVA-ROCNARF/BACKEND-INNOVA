@@ -19,6 +19,6 @@ namespace Domain.Entities.Viaticos
         public decimal SubtotalIva { get; set; }
         public decimal Total { get; set; }
         public string RutaImagen { get; set; } = string.Empty;
-        public ICollection<Viatico>? Viaticos { get; set; }        
+        public ICollection<RelacionViaticoFactura> RelacionViaticoFacturas { get; set; }
     }
 }

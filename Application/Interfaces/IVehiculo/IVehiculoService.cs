@@ -10,5 +10,6 @@ namespace Application.Interfaces.IVehiculo
     public interface IVehiculoService
     {
         Task<int> RegistrarVehiculoAsync(RegistrarVehiculoDTO dto);
+        Task CrearSolicitudCambioVehiculoAsync(CrearSolicitudVehiculoPrincipalDTO dto);
     }
 }

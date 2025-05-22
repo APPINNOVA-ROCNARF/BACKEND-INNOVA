@@ -8,7 +8,7 @@ namespace Domain.Entities.Viaticos
 {
     public enum EstadoSolicitudVehiculo
     {
-        EnRevision = 0,
+        Pendiente = 0,
         Aprobado = 1,
         Rechazado = 2
     }

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Auditoria
 {
-    public class AuditoriaRegistro
+    public abstract class AuditoriaBase
     {
         public int Id { get; set; }
 
         public string TipoEvento { get; set; } = null!;
 
-        public DateTime Fecha { get; set; } = DateTime.UtcNow;
+        public DateTime Fecha { get; set; } = DateTime.Now;
 
         public int? UsuarioId { get; set; }
         public string? UsuarioNombre { get; set; }

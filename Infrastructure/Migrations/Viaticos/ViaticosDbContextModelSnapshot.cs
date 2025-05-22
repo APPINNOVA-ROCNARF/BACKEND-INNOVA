@@ -67,6 +67,32 @@ namespace Infrastructure.Migrations.Viaticos
                     b.ToView(null, (string)null);
                 });
 
+            modelBuilder.Entity("Application.DTO.ViaticoDTO.EstadisticaViaticoDTO", b =>
+                {
+                    b.Property<string>("categoria")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("diferencia")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("porcentaje_ejecucion")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("total_acreditado")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("total_aprobado")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("total_registrado")
+                        .HasColumnType("numeric");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Viaticos.CategoriaViatico", b =>
                 {
                     b.Property<int>("Id")
@@ -198,6 +224,21 @@ namespace Infrastructure.Migrations.Viaticos
                     b.ToTable("ProveedoresViatico");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Viaticos.RelacionViaticoFactura", b =>
+                {
+                    b.Property<int>("ViaticoId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FacturaId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ViaticoId", "FacturaId");
+
+                    b.HasIndex("FacturaId");
+
+                    b.ToTable("RelacionViaticoFacturas");
+                });
+
             modelBuilder.Entity("Domain.Entities.Viaticos.SolicitudVehiculoPrincipal", b =>
                 {
                     b.Property<int>("Id")
@@ -231,6 +272,8 @@ namespace Infrastructure.Migrations.Viaticos
 
                     b.HasKey("Id");
 
+                    b.HasIndex("VehiculoIdSolicitado");
+
                     b.ToTable("SolicitudVehiculoPrincipal");
                 });
 
@@ -263,6 +306,41 @@ namespace Infrastructure.Migrations.Viaticos
                     b.HasKey("Id");
 
                     b.ToTable("SolicitudesViatico");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Viaticos.SubcategoriaViatico", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoriaId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FacturasRequeridas")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoriaId");
+
+                    b.ToTable("SubcategoriaViatico");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoriaId = 1,
+                            FacturasRequeridas = 2,
+                            Nombre = "Mantenimiento"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Viaticos.Vehiculo", b =>
@@ -345,9 +423,6 @@ namespace Infrastructure.Migrations.Viaticos
                     b.Property<int>("EstadoViatico")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("FacturaId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("FechaModificado")
                         .HasColumnType("timestamp without time zone");
 
@@ -360,6 +435,9 @@ namespace Infrastructure.Migrations.Viaticos
                     b.Property<int>("SolicitudViaticoId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("SubcategoriaId")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("VehiculoId")
                         .HasColumnType("integer");
 
@@ -367,9 +445,9 @@ namespace Infrastructure.Migrations.Viaticos
 
                     b.HasIndex("CategoriaId");
 
-                    b.HasIndex("FacturaId");
-
                     b.HasIndex("SolicitudViaticoId");
+
+                    b.HasIndex("SubcategoriaId");
 
                     b.HasIndex("VehiculoId");
 
@@ -385,6 +463,47 @@ namespace Infrastructure.Migrations.Viaticos
                         .IsRequired();
 
                     b.Navigation("Proveedor");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Viaticos.RelacionViaticoFactura", b =>
+                {
+                    b.HasOne("Domain.Entities.Viaticos.FacturaViatico", "Factura")
+                        .WithMany("RelacionViaticoFacturas")
+                        .HasForeignKey("FacturaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Viaticos.Viatico", "Viatico")
+                        .WithMany("RelacionViaticoFacturas")
+                        .HasForeignKey("ViaticoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Factura");
+
+                    b.Navigation("Viatico");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Viaticos.SolicitudVehiculoPrincipal", b =>
+                {
+                    b.HasOne("Domain.Entities.Viaticos.Vehiculo", "Vehiculo")
+                        .WithMany()
+                        .HasForeignKey("VehiculoIdSolicitado")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Vehiculo");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Viaticos.SubcategoriaViatico", b =>
+                {
+                    b.HasOne("Domain.Entities.Viaticos.CategoriaViatico", "Categoria")
+                        .WithMany("Subcategorias")
+                        .HasForeignKey("CategoriaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Categoria");
                 });
 
             modelBuilder.Entity("Domain.Entities.Viaticos.VehiculoPrincipal", b =>
@@ -406,16 +525,16 @@ namespace Infrastructure.Migrations.Viaticos
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Viaticos.FacturaViatico", "Factura")
-                        .WithMany("Viaticos")
-                        .HasForeignKey("FacturaId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("Domain.Entities.Viaticos.SolicitudViatico", "SolicitudViatico")
                         .WithMany("Viaticos")
                         .HasForeignKey("SolicitudViaticoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Domain.Entities.Viaticos.SubcategoriaViatico", "Subcategoria")
+                        .WithMany("Viaticos")
+                        .HasForeignKey("SubcategoriaId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Domain.Entities.Viaticos.Vehiculo", "Vehiculo")
                         .WithMany("Viaticos")
@@ -424,21 +543,23 @@ namespace Infrastructure.Migrations.Viaticos
 
                     b.Navigation("Categoria");
 
-                    b.Navigation("Factura");
-
                     b.Navigation("SolicitudViatico");
+
+                    b.Navigation("Subcategoria");
 
                     b.Navigation("Vehiculo");
                 });
 
             modelBuilder.Entity("Domain.Entities.Viaticos.CategoriaViatico", b =>
                 {
+                    b.Navigation("Subcategorias");
+
                     b.Navigation("Viaticos");
                 });
 
             modelBuilder.Entity("Domain.Entities.Viaticos.FacturaViatico", b =>
                 {
-                    b.Navigation("Viaticos");
+                    b.Navigation("RelacionViaticoFacturas");
                 });
 
             modelBuilder.Entity("Domain.Entities.Viaticos.ProveedorViatico", b =>
@@ -451,9 +572,19 @@ namespace Infrastructure.Migrations.Viaticos
                     b.Navigation("Viaticos");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Viaticos.SubcategoriaViatico", b =>
+                {
+                    b.Navigation("Viaticos");
+                });
+
             modelBuilder.Entity("Domain.Entities.Viaticos.Vehiculo", b =>
                 {
                     b.Navigation("Viaticos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Viaticos.Viatico", b =>
+                {
+                    b.Navigation("RelacionViaticoFacturas");
                 });
 #pragma warning restore 612, 618
         }

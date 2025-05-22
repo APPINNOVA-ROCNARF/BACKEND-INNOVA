@@ -2,6 +2,7 @@
 using Application.Helpers;
 using Application.Interfaces.IArchivo;
 using Application.Options;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -36,5 +37,37 @@ namespace BackendAPI.Controllers.Archivos
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [HttpPost("upload-temp")]
+        public async Task<IActionResult> UploadTemp([FromForm] ArchivoFormDTO form)
+        {
+            var file = form.File;
+
+            if (file == null || file.Length == 0)
+                return BadRequest("Archivo no válido.");
+
+            using var ms = new MemoryStream();
+            await file.CopyToAsync(ms);
+            var contenido = ms.ToArray();
+
+            var dto = new ArchivoUploadDTO
+            {
+                Nombre = Path.GetFileNameWithoutExtension(file.FileName),
+                Extension = Path.GetExtension(file.FileName),
+                Contenido = contenido
+            };
+
+            var rutaTemporal = await _archivoService.SubirArchivoTempAsync(dto, _env.WebRootPath);
+
+            var resultado = new ArchivoTemporalGuardadoDTO
+            {
+                NombreOriginal = file.FileName,
+                RutaTemporal = rutaTemporal,
+                Extension = dto.Extension
+            };
+
+            return Ok(resultado);
+        }
+
     }
 }

@@ -14,8 +14,8 @@ namespace Domain.Entities.Usuarios
         public required string Email { get; set; }
         public required string Password { get; set; }
         public bool Estado { get; set; }
-        public DateTime CreadoEn { get; set; } = DateTime.UtcNow;
-        public DateTime ModificadoEn { get; set; } = DateTime.UtcNow;
+        public DateTime CreadoEn { get; set; } = DateTime.Now;
+        public DateTime ModificadoEn { get; set; } = DateTime.Now;
 
         public int RolId { get; set; }
         public Rol Rol { get; set; }

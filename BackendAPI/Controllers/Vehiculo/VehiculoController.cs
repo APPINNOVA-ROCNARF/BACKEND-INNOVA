@@ -30,5 +30,12 @@ namespace BackendAPI.Controllers.Vehiculo
                 return BadRequest(new { mensaje = ex.Message });
             }
         }
+
+        [HttpPost("solicitar-cambio-vehiculo-principal")]
+        public async Task<IActionResult> SolicitarCambioVehiculo([FromBody] CrearSolicitudVehiculoPrincipalDTO dto)
+        {
+            await _vehiculoService.CrearSolicitudCambioVehiculoAsync(dto);
+            return Ok(new { mensaje = "Solicitud registrada correctamente." });
+        }
     }
 }

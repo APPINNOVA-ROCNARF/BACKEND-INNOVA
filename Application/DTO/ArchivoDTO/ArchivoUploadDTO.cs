@@ -8,6 +8,7 @@ namespace Application.DTO.ArchivoDTO
 {
     public class ArchivoUploadDTO
     {
+        public string Nombre { get; set; } = string.Empty;  
         public string Extension { get; set; } = string.Empty;
         public byte[] Contenido { get; set; } = Array.Empty<byte>();
     }

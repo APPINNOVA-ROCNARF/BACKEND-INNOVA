@@ -1,4 +1,5 @@
 ﻿using Application.DTO.VehiculoDTO;
+using Application.Exceptions;
 using Application.Interfaces.IUsuario;
 using Application.Interfaces.IVehiculo;
 using Domain.Entities.Viaticos;
@@ -34,6 +35,33 @@ namespace Application.Services
             };
 
             return await _vehiculoRepository.RegistrarVehiculoAsync(vehiculo);
+        }
+
+        public async Task CrearSolicitudCambioVehiculoAsync(CrearSolicitudVehiculoPrincipalDTO dto)
+        {
+            if (!await _vehiculoRepository.ExisteVehiculoAsync(dto.VehiculoIdSolicitado))
+                throw new BusinessException("El vehículo solicitado no existe.");
+
+            if (!await _vehiculoRepository.VehiculoPerteneceAlUsuarioAsync(dto.VehiculoIdSolicitado, dto.UsuarioAppId))
+                throw new BusinessException("El vehículo solicitado no pertenece al usuario.");
+
+            if (await _vehiculoRepository.ExisteSolicitudPendienteAsync(dto.UsuarioAppId))
+                throw new BusinessException("Ya existe una solicitud pendiente para este usuario.");
+
+            if (await _vehiculoRepository.VehiculoYaEsPrincipalAsync(dto.VehiculoIdSolicitado))
+                throw new BusinessException("El vehículo solicitado ya está asignado como principal a otro usuario.");
+
+
+            var solicitud = new SolicitudVehiculoPrincipal
+            {
+                UsuarioAppId = dto.UsuarioAppId,
+                VehiculoIdSolicitado = dto.VehiculoIdSolicitado,
+                Motivo = dto.Motivo,
+                Estado = EstadoSolicitudVehiculo.Pendiente,
+                FechaRegistro = DateTime.Now
+            };
+
+            await _vehiculoRepository.AgregarSolicitudCambioVehiculoAsync(solicitud);
         }
     }
 }

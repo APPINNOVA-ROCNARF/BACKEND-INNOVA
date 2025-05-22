@@ -25,6 +25,8 @@ namespace Infrastructure.Data
         public DbSet<VehiculoPrincipal> VehiculoPrincipal { get; set; }
         public DbSet<SolicitudVehiculoPrincipal> SolicitudVehiculoPrincipal { get; set; }
         public DbSet<CupoMensual> CupoMensual { get; set; }
+        public DbSet<SubcategoriaViatico> SubcategoriaViatico { get; set; }
+        public DbSet<RelacionViaticoFactura> RelacionViaticoFacturas {  get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -76,11 +78,6 @@ namespace Infrastructure.Data
                       .HasForeignKey(v => v.SolicitudViaticoId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(v => v.Factura)
-                      .WithMany(f => f.Viaticos)
-                      .HasForeignKey(v => v.FacturaId)
-                      .OnDelete(DeleteBehavior.SetNull);
-
                 entity.HasOne(v => v.Categoria)
                       .WithMany(c => c.Viaticos)
                       .HasForeignKey(v => v.CategoriaId)
@@ -90,6 +87,29 @@ namespace Infrastructure.Data
                       .WithMany(vh => vh.Viaticos)
                       .HasForeignKey(v => v.VehiculoId)
                       .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(v => v.Subcategoria)
+                      .WithMany(s => s.Viaticos)
+                      .HasForeignKey(v => v.SubcategoriaId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+            });
+
+            // RELACION VIATICO FACTURAS
+
+            modelBuilder.Entity<RelacionViaticoFactura>(entity =>
+            {
+                entity.HasKey(vf => new { vf.ViaticoId, vf.FacturaId });
+
+                entity.HasOne(vf => vf.Viatico)
+                      .WithMany(v => v.RelacionViaticoFacturas)
+                      .HasForeignKey(vf => vf.ViaticoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(vf => vf.Factura)
+                      .WithMany(f => f.RelacionViaticoFacturas)
+                      .HasForeignKey(vf => vf.FacturaId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             // CATEGORIA
@@ -103,6 +123,33 @@ namespace Infrastructure.Data
                     new CategoriaViatico { Id = 2, Nombre = "Alimentación", Estado = true },
                     new CategoriaViatico { Id = 3, Nombre = "Hospedaje", Estado = true }
                  );
+            });
+
+            // SUBCATEGORIA
+            modelBuilder.Entity<SubcategoriaViatico>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+
+                entity.Property(s => s.Nombre)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(s => s.FacturasRequeridas)
+                      .IsRequired();
+
+                entity.HasOne(s => s.Categoria)
+                      .WithMany(c => c.Subcategorias)
+                      .HasForeignKey(s => s.CategoriaId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasData(
+                    new SubcategoriaViatico
+                    {
+                        Id = 1,
+                        Nombre = "Mantenimiento",
+                        CategoriaId = 1,
+                        FacturasRequeridas = 2,
+                    }
+                );
             });
 
             // PROVEEDOR
@@ -211,6 +258,11 @@ namespace Infrastructure.Data
                 entity.Property(s => s.FechaAprobacion)
                       .HasColumnType("timestamp without time zone")
                       .IsRequired(false);
+
+                entity.HasOne(s => s.Vehiculo)
+                      .WithMany()
+                      .HasForeignKey(s => s.VehiculoIdSolicitado)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<CupoMensual>(entity =>

@@ -1,5 +1,6 @@
 ﻿using Application.Audit;
 using Domain.Common;
+using Domain.Entities.Auditoria;
 using Domain.Events;
 using Microsoft.Extensions.Logging;
 using System;
@@ -28,17 +29,20 @@ namespace Application.EventHandlers.Auditoria
             var datos = new
             {
                 ViaticoId = domainEvent.ViaticoId,
-                EstadoAnterior = domainEvent.EstadoAnterior.ToString(),
-                EstadoNuevo = domainEvent.EstadoNuevo.ToString(),
+                Campo = domainEvent.Campo,
+                ValorAnterior = domainEvent.ValorAnterior.ToString(),
+                ValorNuevo = domainEvent.ValorNuevo.ToString(),
                 FechaEvento = domainEvent.FechaEvento
             };
 
-            await _auditoriaService.RegistrarEventoAsync(
-                tipoEvento: "CambioEstadoViatico",
-                datos: datos,
-                entidad: "Viatico",
-                entidadId: domainEvent.ViaticoId
-                );
+            await _auditoriaService.RegistrarEventoAsync(new AuditoriaEventoDTO
+            {
+                Modulo = ModulosAuditoria.Viaticos,
+                TipoEvento = "CambioEstadoViatico",
+                Datos = datos,
+                Entidad = "Viatico",
+                EntidadId = domainEvent.ViaticoId
+            });
 
             _logger.LogInformation("Auditoría registrada para cambio de estado del viático {Id}", domainEvent.ViaticoId);
         }
