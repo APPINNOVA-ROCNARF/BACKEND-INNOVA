@@ -47,7 +47,7 @@ namespace BackendAPI.Controllers.Roles
             try
             {
                 await _rolService.CrearRolAsync(dto);
-                return Ok(new { mensaje = "Rol creado correctamente" });
+                return Ok();
             }
             catch (Exception ex)
             {

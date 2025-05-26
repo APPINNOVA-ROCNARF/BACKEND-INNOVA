@@ -58,7 +58,7 @@ namespace Infrastructure.Migrations.Sistema
 
                     b.HasIndex("GuiaProductoId");
 
-                    b.ToTable("ArchivosGuiaProducto");
+                    b.ToTable("ArchivoGuiaProducto");
                 });
 
             modelBuilder.Entity("Domain.Entities.Sistema.Ciclo", b =>
@@ -174,6 +174,44 @@ namespace Infrastructure.Migrations.Sistema
                     b.HasIndex("FuerzaId");
 
                     b.ToTable("GuiasProducto");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Sistema.ParrillaPromocional", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ExtensionArchivo")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<DateTime>("FechaModificado")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NombreArchivo")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("UrlArchivo")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ParrillasPromocional");
                 });
 
             modelBuilder.Entity("Domain.Entities.Sistema.Region", b =>

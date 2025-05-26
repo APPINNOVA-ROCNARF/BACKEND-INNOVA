@@ -12,7 +12,7 @@ namespace Domain.Entities.Auditoria
 
         public string TipoEvento { get; set; } = null!;
 
-        public DateTime Fecha { get; set; } = DateTime.Now;
+        public DateTime Fecha { get; set; } = DateTime.UtcNow;
 
         public int? UsuarioId { get; set; }
         public string? UsuarioNombre { get; set; }

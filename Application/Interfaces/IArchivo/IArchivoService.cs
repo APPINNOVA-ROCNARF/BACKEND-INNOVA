@@ -9,6 +9,6 @@ namespace Application.Interfaces.IArchivo
 {
     public interface IArchivoService
     {
-        Task<string> SubirArchivoTempAsync(ArchivoUploadDTO archivoDto, string webRootPath);
+        Task<string> SubirArchivoTempAsync(ArchivoUploadDTO archivoDto, string rutaBase);
     }
 }

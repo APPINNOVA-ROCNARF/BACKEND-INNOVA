@@ -19,6 +19,7 @@ namespace Infrastructure.Data
         public DbSet<Seccion> Secciones { get; set; }
         public DbSet<GuiaProducto> GuiasProducto { get; set; }
         public DbSet<ArchivoGuiaProducto> ArchivoGuiaProducto { get; set; }
+        public DbSet<ParrillaPromocional> ParrillasPromocional { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -155,6 +156,33 @@ namespace Infrastructure.Data
                       .WithMany(g => g.Archivos)
                       .HasForeignKey(a => a.GuiaProductoId)
                       .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ParrillaPromocional>(entity =>
+            {
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Nombre)
+                      .IsRequired()
+                      .HasMaxLength(200);
+
+                entity.Property(e => e.Descripcion)
+                      .IsRequired()
+                      .HasMaxLength(1000);
+
+                entity.Property(e => e.FechaModificado)
+                      .IsRequired()
+                      .HasColumnType("timestamp without time zone");
+
+                entity.Property(e => e.NombreArchivo)
+                      .HasMaxLength(255);
+
+                entity.Property(e => e.ExtensionArchivo)
+                      .HasMaxLength(10);
+
+                entity.Property(e => e.UrlArchivo)
+                      .HasMaxLength(500);
             });
         }
 

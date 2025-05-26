@@ -57,7 +57,8 @@ namespace BackendAPI.Controllers.Archivos
                 Contenido = contenido
             };
 
-            var rutaTemporal = await _archivoService.SubirArchivoTempAsync(dto, _env.WebRootPath);
+            var rutaBase = Path.Combine(_env.ContentRootPath, "Storage");
+            var rutaTemporal = await _archivoService.SubirArchivoTempAsync(dto, rutaBase);
 
             var resultado = new ArchivoTemporalGuardadoDTO
             {
@@ -67,6 +68,45 @@ namespace BackendAPI.Controllers.Archivos
             };
 
             return Ok(resultado);
+        }
+
+        [HttpGet("descargar")]
+        public IActionResult DescargarArchivo([FromQuery] string rutaRelativa, [FromQuery] string? modo = "ver")
+        {
+            if (string.IsNullOrWhiteSpace(rutaRelativa))
+                return BadRequest("Ruta no válida.");
+
+            if (rutaRelativa.Contains(".."))
+                return BadRequest("Ruta no permitida.");
+
+            rutaRelativa = Uri.UnescapeDataString(rutaRelativa);
+            rutaRelativa = rutaRelativa.TrimStart('/');
+
+            var rutaCompleta = Path.Combine(_env.ContentRootPath, "Storage", rutaRelativa.Replace("/", Path.DirectorySeparatorChar.ToString()));
+
+            if (!System.IO.File.Exists(rutaCompleta))
+                return NotFound("Archivo no encontrado.");
+
+            var extension = Path.GetExtension(rutaCompleta).ToLowerInvariant();
+            var mime = extension switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".pdf" => "application/pdf",
+                ".txt" => "text/plain",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                _ => "application/octet-stream"
+            };
+
+            var contenido = System.IO.File.ReadAllBytes(rutaCompleta);
+            var nombreArchivo = Path.GetFileName(rutaRelativa);
+            var encodedFileName = Uri.EscapeDataString(nombreArchivo);
+
+            var disposition = modo?.ToLowerInvariant() == "descargar" ? "attachment" : "inline";
+
+            return File(contenido, mime, disposition == "attachment" ? nombreArchivo : null);
         }
 
     }

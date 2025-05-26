@@ -14,6 +14,9 @@ namespace Application.Interfaces.IArchivo
         Task<List<string>> MoverArchivosAGuiaProductoAsync(
     List<MoverArchivoGuiaDTO> archivos,
     int guiaProductoId,
-    string webRootPath);
+    string rutaBase);
+
+        Task<string> MoverArchivosParrillaPromocionalAsync(MoverArchivoGuiaDTO archivo, int parrillaPromocionalId, string rutaBase);
     }
+
 }

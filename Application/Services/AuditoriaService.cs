@@ -56,7 +56,7 @@ namespace Application.Services
 
                 var auditoria = CrearInstanciaAuditoria(evento.Modulo);
                 auditoria.TipoEvento = evento.TipoEvento;
-                auditoria.Fecha = DateTime.Now;
+                auditoria.Fecha = DateTime.UtcNow;
                 auditoria.Datos = datosJson;
                 auditoria.EntidadAfectada = evento.Entidad;
                 auditoria.EntidadId = evento.EntidadId;

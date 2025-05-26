@@ -22,7 +22,7 @@ namespace Domain.Events
             Campo = campo;
             ValorAnterior = anterior;
             ValorNuevo = nuevo;
-            FechaEvento = DateTime.Now;
+            FechaEvento = DateTime.UtcNow;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿
 using Application.DTO.ArchivoDTO;
+using Application.Exceptions;
 using Application.Interfaces.IArchivo;
 using Application.Options;
 using Microsoft.Extensions.Options;
@@ -10,34 +11,35 @@ namespace Infrastructure.Repositories
     {
         private readonly ArchivosOptions _opciones;
 
+
         public ArchivoRepository(IOptions<ArchivosOptions> opciones)
         {
             _opciones = opciones.Value;
         }
 
-        public async Task<string> GuardarArchivoTempAsync(ArchivoUploadDTO archivoDto, string webRootPath)
+        public async Task<string> GuardarArchivoTempAsync(ArchivoUploadDTO archivoDto, string rutaBase)
         {
             if (archivoDto == null)
                 throw new ArgumentNullException(nameof(archivoDto), "El archivo enviado está vacío.");
 
             if (archivoDto.Contenido == null || archivoDto.Contenido.Length == 0)
-                throw new InvalidOperationException("El contenido del archivo no puede estar vacío.");
+                throw new BusinessException("El contenido del archivo no puede estar vacío.");
 
 
 
 
             var extension = archivoDto.Extension.ToLower();
             if (!_opciones.ExtensionesPermitidas.Contains(extension))
-                throw new InvalidOperationException("Extensión no permitida.");
+                throw new BusinessException("Extensión no permitida.");
 
             if (archivoDto.Contenido.Length > _opciones.MaximoMB * 1024 * 1024)
-                throw new InvalidOperationException("Archivo excede el tamaño máximo permitido.");
+                throw new BusinessException("Archivo excede el tamaño máximo permitido.");
 
             var fecha = DateTime.Now.ToString("yyyy-MM-dd");
             var nombreFinal = Guid.NewGuid() + extension;
 
             var rutaRelativa = Path.Combine(_opciones.RutaBase, "temp", fecha, nombreFinal).Replace("\\", "/");
-            var rutaCompleta = Path.Combine(webRootPath, rutaRelativa);
+            var rutaCompleta = Path.Combine(rutaBase, rutaRelativa);
 
             Directory.CreateDirectory(Path.GetDirectoryName(rutaCompleta)!);
             await File.WriteAllBytesAsync(rutaCompleta, archivoDto.Contenido);
@@ -46,14 +48,13 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<List<ArchivoTemporalGuardadoDTO>> GuardarArchivosTempAsync(
-            List<ArchivoUploadDTO> archivosDto,
-            string webRootPath)
+            List<ArchivoUploadDTO> archivosDto, string rutaBase)
         {
             var archivosGuardados = new List<ArchivoTemporalGuardadoDTO>();
 
             foreach (var archivoDto in archivosDto)
             {
-                var rutaRelativa = await GuardarArchivoTempAsync(archivoDto, webRootPath);
+                var rutaRelativa = await GuardarArchivoTempAsync(archivoDto, rutaBase);
 
                 archivosGuardados.Add(new ArchivoTemporalGuardadoDTO
                 {
@@ -91,16 +92,16 @@ namespace Infrastructure.Repositories
             Directory.CreateDirectory(Path.GetDirectoryName(rutaFinalCompleta)!);
             File.Move(rutaTemporalCompleta, rutaFinalCompleta);
 
-            return rutaRelativaFinal;
+            return  rutaRelativaFinal;
         }
 
-        public async Task<List<string>> MoverArchivosAGuiaProductoAsync(List<MoverArchivoGuiaDTO> archivos, int guiaProductoId, string webRootPath)
+        public async Task<List<string>> MoverArchivosAGuiaProductoAsync(List<MoverArchivoGuiaDTO> archivos, int guiaProductoId, string rutaBase)
         {
             var rutasFinales = new List<string>();
 
             foreach (var archivo in archivos)
             {
-                var rutaTemporalCompleta = Path.Combine(webRootPath, archivo.RutaTemporal);
+                var rutaTemporalCompleta = Path.Combine(rutaBase, archivo.RutaTemporal);
 
                 if (!File.Exists(rutaTemporalCompleta))
                     throw new FileNotFoundException("Archivo no encontrado: " + archivo.RutaTemporal);
@@ -115,7 +116,7 @@ namespace Infrastructure.Repositories
                     nombreFinal
                 ).Replace("\\", "/");
 
-                var rutaFinalCompleta = Path.Combine(webRootPath, rutaRelativaFinal);
+                var rutaFinalCompleta = Path.Combine(rutaBase, rutaRelativaFinal);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(rutaFinalCompleta)!);
                 File.Move(rutaTemporalCompleta, rutaFinalCompleta);
@@ -126,8 +127,30 @@ namespace Infrastructure.Repositories
             return rutasFinales;
         }
 
+        public async Task<string> MoverArchivosParrillaPromocionalAsync(MoverArchivoGuiaDTO archivo, int parrillaPromocionalId, string rutaBase)
+        {
+            var rutaTemporalCompleta = Path.Combine(rutaBase, archivo.RutaTemporal);
 
+            if (!File.Exists(rutaTemporalCompleta))
+                throw new FileNotFoundException("Archivo no encontrado: " + archivo.RutaTemporal);
 
+            var extension = Path.GetExtension(archivo.RutaTemporal);
+            var nombreFinal = $"{Path.GetFileNameWithoutExtension(archivo.NombreOriginal)}_{Guid.NewGuid()}{extension}";
+
+            var rutaRelativaFinal = Path.Combine(
+                _opciones.RutaBase,
+                "parrilla-promocional",
+                parrillaPromocionalId.ToString(),
+                nombreFinal
+            ).Replace("\\", "/");
+
+            var rutaFinalCompleta = Path.Combine(rutaBase, rutaRelativaFinal);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(rutaFinalCompleta)!);
+            File.Move(rutaTemporalCompleta, rutaFinalCompleta);
+
+            return rutaRelativaFinal;
+        }
 
     }
 

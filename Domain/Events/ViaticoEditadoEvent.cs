@@ -21,7 +21,7 @@ namespace Domain.Events
             CampoEditado = campoEditado;
             ValorAnterior = valorAnterior;
             ValorNuevo = valorNuevo;
-            FechaEvento = DateTime.Now;
+            FechaEvento = DateTime.UtcNow;
         }
     }
 }
