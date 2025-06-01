@@ -23,7 +23,12 @@ namespace Infrastructure.Repositories
         }
 
         // Métodos para User
-        public async Task<IEnumerable<Usuario>> GetAllUsersAsync() => await _context.Usuarios.ToListAsync();
+        public async Task<List<Usuario>> GetAllUsersAsync()
+        {
+            return await _context.Usuarios
+                .Include(u => u.Rol) 
+                .ToListAsync();
+        }
         public async Task<Usuario> GetUserByIdAsync(int id) => await _context.Usuarios.FindAsync(id);
         public async Task<Usuario> CreateUserAsync(Usuario usuario) { _context.Usuarios.Add(usuario); await _context.SaveChangesAsync(); return usuario; }
         public async Task UpdateUserAsync(Usuario usuario) { _context.Usuarios.Update(usuario); await _context.SaveChangesAsync(); }
@@ -62,6 +67,7 @@ namespace Infrastructure.Repositories
 
             var modulos = await _context.Modulos
                     .Where(m => m.RolModulos.Any(rm => rm.RolId == rolId))
+                    .OrderBy(m => m.Orden)
                     .Select(m => new ModuloMenuDTO
                     {
                         Id = m.Id,

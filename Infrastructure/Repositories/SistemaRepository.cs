@@ -33,7 +33,9 @@ namespace Infrastructure.Repositories
                 {
                     Id = c.Id,
                     Nombre = c.Nombre,
-                    Estado = c.Estado
+                    Estado = c.Estado,
+                    FechaInicio = c.FechaInicio,
+                    FechaFin = c.FechaFin ?? DateTime.Today
                 })
                 .ToListAsync();
         }

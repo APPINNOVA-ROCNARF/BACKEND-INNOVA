@@ -13,7 +13,7 @@ namespace Application.Interfaces.IUsuario
     public interface IUsuarioService
     {
         // Métodos para Usuarios
-        Task<IEnumerable<Usuario>> GetAllUsersAsync();
+        Task<IEnumerable<UsuarioListDTO>> GetAllUsersAsync();
         Task<Usuario> GetUserByIdAsync(int id);
         Task<Usuario> CreateUserAsync(Usuario usuario);
         Task UpdateUserAsync(Usuario usuario);

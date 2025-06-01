@@ -22,7 +22,7 @@ public class UsuarioController : ControllerBase
 
     // Obtener todos los usuarios
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Usuario>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<UsuarioListDTO>>> GetUsers()
     {
         var users = await _userService.GetAllUsersAsync();
         return Ok(users);

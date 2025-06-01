@@ -26,9 +26,22 @@ namespace Application.Services
         }
 
         // Métodos para User
-        public async Task<IEnumerable<Usuario>> GetAllUsersAsync()
+        public async Task<IEnumerable<UsuarioListDTO>> GetAllUsersAsync()
         {
-            return await _userRepository.GetAllUsersAsync();
+            var usuarios = await _userRepository.GetAllUsersAsync();
+
+            var usuariosDTO = usuarios.Select(u => new UsuarioListDTO
+            {
+                Id = u.Id,
+                Nombre = u.Nombre,
+                Email = u.Email,
+                Rol = u.Rol.Nombre,
+                Estado = u.Estado,
+                CreadoEn = u.CreadoEn,
+                ModificadoEn = u.ModificadoEn
+            }).ToList();
+
+            return usuariosDTO;
         }
 
         public async Task<Usuario> GetUserByIdAsync(int id)
