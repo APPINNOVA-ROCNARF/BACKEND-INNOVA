@@ -33,6 +33,11 @@ namespace Application.Services
         {
             return await _repository.ObtenerFuerzasSelectAsync();
         }
+
+        public async Task<List<SeccionSelectDTO>> ObtenerSeccionesSelectAsync()
+        {
+            return await _repository.ObtenerSeccionSelectAsync();
+        }
         public async Task<string> ObtenerNombreCicloAsync(int cicloId)
         {
             return await _repository.ObtenerNombreCicloAsync(cicloId);

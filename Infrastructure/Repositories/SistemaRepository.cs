@@ -50,6 +50,18 @@ namespace Infrastructure.Repositories
                 })
                 .ToListAsync();
         }
+
+        public async Task<List<SeccionSelectDTO>> ObtenerSeccionSelectAsync()
+        {
+            return await _context.Secciones
+                .Select(c => new SeccionSelectDTO
+                {
+                    Id = c.Id,
+                    Codigo = c.Codigo,
+                })
+                .ToListAsync();
+        }
+
         public async Task<string> ObtenerNombreCicloAsync(int cicloId)
         {
             var ciclo = await _context.Ciclos

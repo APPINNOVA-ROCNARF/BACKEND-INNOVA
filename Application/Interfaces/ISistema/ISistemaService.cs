@@ -8,6 +8,8 @@ namespace Application.Interfaces.ISistema
     {
         Task<List<CicloSelectDTO>> ObtenerCiclosSelectAsync();
         Task<List<FuerzaSelectDTO>> ObtenerFuerzasSelectAsync();
+        Task<List<SeccionSelectDTO>> ObtenerSeccionesSelectAsync();
+
         Task<string> ObtenerNombreCicloAsync(int cicloId);
         Task<int?> ObtenerIdPorCodigoSeccionAsync(string codigo);
         // GUIAS DE PRODUCTO

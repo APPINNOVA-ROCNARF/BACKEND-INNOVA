@@ -35,6 +35,14 @@ namespace BackendAPI.Controllers.Sistema
             return Ok(fuerzas);
         }
 
+        [HttpGet("secciones/select")]
+        public async Task<IActionResult> GetSeccionesSelect()
+        {
+            var secciones = await _service.ObtenerSeccionesSelectAsync();
+            return Ok(secciones);
+        }
+
+
         [HttpPost("guia-producto")]
         public async Task<IActionResult> CrearGuiaProducto([FromBody] CrearGuiaProductoDTO dto)
         {

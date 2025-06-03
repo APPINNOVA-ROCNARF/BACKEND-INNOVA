@@ -16,7 +16,7 @@ namespace Application.Interfaces.ISistema
         Task<List<FuerzaSelectDTO>> ObtenerFuerzasSelectAsync();
         Task<string> ObtenerNombreCicloAsync(int cicloId);
         Task<int?> ObtenerIdPorCodigoSeccionAsync(string codigo);
-
+        Task<List<SeccionSelectDTO>> ObtenerSeccionSelectAsync();
         //GUIA DE PRODUCTOS
         Task<int> InsertarAsync(GuiaProducto guia);
         Task InsertarArchivosAsync(IEnumerable<ArchivoGuiaProducto> archivos);
