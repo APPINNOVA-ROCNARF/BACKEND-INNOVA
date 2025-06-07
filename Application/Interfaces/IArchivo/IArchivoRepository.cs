@@ -10,7 +10,7 @@ namespace Application.Interfaces.IArchivo
     public interface IArchivoRepository
     {
         Task<string> GuardarArchivoTempAsync(ArchivoUploadDTO archivoDto, string webRootPath);
-        Task<string> MoverArchivoFinalAsync(MoverArchivoDTO dto, string webRootPath);
+        Task<string> MoverArchivoFinalAsync(MoverArchivoDTO dto, string rutaBase);
         Task<List<string>> MoverArchivosAGuiaProductoAsync(
     List<MoverArchivoGuiaDTO> archivos,
     int guiaProductoId,

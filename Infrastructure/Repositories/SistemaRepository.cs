@@ -95,7 +95,6 @@ namespace Infrastructure.Repositories
         public async Task<List<GuiaProductoDTO>> ObtenerGuiasProductoAsync()
         {
             return await _context.GuiasProducto
-                .Where(g => g.Activo)
                 .Include(g => g.Fuerza)
                 .Select(g => new GuiaProductoDTO
                 {
@@ -113,7 +112,7 @@ namespace Infrastructure.Repositories
             var guia = await _context.GuiasProducto
                 .Include(g => g.Fuerza)
                 .Include(g => g.Archivos)
-                .FirstOrDefaultAsync(g => g.Id == id && g.Activo);
+                .FirstOrDefaultAsync(g => g.Id == id);
 
             if (guia == null) return null;
 
@@ -125,8 +124,8 @@ namespace Infrastructure.Repositories
                 FuerzaNombre = guia.Fuerza?.Nombre ?? "",
                 FuerzaId = guia.FuerzaId,
                 UrlVideo = guia.UrlVideo,
+                Activo = guia.Activo,
                 Archivos = guia.Archivos
-                .Where(a => a.Activo)
                 .Select(a => new ArchivoGuiaDTO
                 {
                     Id = a.Id,

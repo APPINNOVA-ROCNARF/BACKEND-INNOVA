@@ -10,7 +10,7 @@ namespace Application.DTO.ViaticoDTO
     public class CrearViaticoDTO
     {
         public Viatico Viatico { get; set; }
-        public List<FacturaViatico> Facturas { get; set; }
+        public FacturaViatico Factura { get; set; }
         public int UsuarioAppId { get; set; }
         public int CicloId { get; set; }
         public decimal Monto { get; set; }

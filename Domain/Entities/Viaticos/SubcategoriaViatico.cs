@@ -14,9 +14,6 @@ namespace Domain.Entities.Viaticos
 
         public int CategoriaId { get; set; }
         public CategoriaViatico Categoria { get; set; }
-
-        public int FacturasRequeridas { get; set; }
-
         public ICollection<Viatico> Viaticos { get; set; }
     }
 }

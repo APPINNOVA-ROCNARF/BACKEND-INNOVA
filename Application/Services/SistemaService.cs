@@ -131,6 +131,7 @@ namespace Application.Services
             guia.Nombre = dto.Nombre;
             guia.UrlVideo = dto.UrlVideo;
             guia.FuerzaId = dto.FuerzaId;
+            guia.Activo = dto.Activo;
 
             // Actualizar entidad en BD
             await _repository.ActualizarGuiaAsync(guia);

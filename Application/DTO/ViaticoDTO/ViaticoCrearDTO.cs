@@ -15,6 +15,6 @@ namespace Application.DTO.ViaticoDTO
         public int? VehiculoId { get; set; }
 
         public string? Comentario { get; set; }      
-        public List<FacturaCrearDTO> Facturas { get; set; }  
+        public FacturaCrearDTO Factura { get; set; }  
     }
 }

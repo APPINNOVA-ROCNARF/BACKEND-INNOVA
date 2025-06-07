@@ -94,7 +94,9 @@ namespace Infrastructure.Data
                 new Fuerza { Id = 1, Codigo = "F1", Nombre = "F1" },
                 new Fuerza { Id = 2, Codigo = "F2", Nombre = "F2" },
                 new Fuerza { Id = 3, Codigo = "F3", Nombre = "F3" },
-                new Fuerza { Id = 4, Codigo = "F4", Nombre = "F4" }
+                new Fuerza { Id = 4, Codigo = "F4", Nombre = "F4" },
+                new Fuerza { Id = 5, Codigo = "BF", Nombre = "BioFemme"},
+                new Fuerza { Id = 6, Codigo = "DC", Nombre = "Drocaras"}
             );
 
             // GUIA PRODUCTO

@@ -3,21 +3,14 @@ using Application.DTO.ArchivoDTO;
 using Application.DTO.ViaticoDTO;
 using Application.Enums.Viatico;
 using Application.Exceptions;
-using Application.Helpers;
 using Application.Interfaces.IArchivo;
 using Application.Interfaces.IUnitOfWork;
 using Application.Interfaces.IUsuario;
-using Application.Interfaces.IVehiculo;
 using Application.Interfaces.IViatico;
 using ClosedXML.Excel;
 using Domain.Common;
 using Domain.Entities.Viaticos;
 using Domain.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Services
 {
@@ -52,71 +45,34 @@ namespace Application.Services
             _eventDispatcher =eventDispatcher;
         }
 
-        public async Task<int> CrearViaticoAsync(ViaticoCrearDTO dto, string webRootPath)
+        public async Task<int> CrearViaticoAsync(ViaticoCrearDTO dto, string rutaBase)
         {
-            var facturasFinales = new List<FacturaViatico>();
-            decimal montoTotal = 0;
+            var moverArchivoDto = new MoverArchivoDTO
+            {
+                RutaRelativaTemporal = dto.Factura.RutaTemporal,
+                UsuarioAppId = dto.UsuarioAppId,
+                CicloId = dto.CicloId,
+                FechaFactura = dto.Factura.FechaFactura,
+                PrefijoNombre = "factura"
+            };
+
+            var rutaFinal = await _archivoRepository.MoverArchivoFinalAsync(moverArchivoDto, rutaBase);
+            var rutaAbsoluta = Path.Combine(rutaBase, rutaFinal);
 
             await _unitOfWork.BeginTransactionAsync();
 
             try
             {
-                SubcategoriaViatico? subcategoria = null;
-
-                if (dto.SubcategoriaId.HasValue)
+                if (!await _proveedorRepository.ExistePorRucAsync(dto.Factura.RucProveedor))
                 {
-                    subcategoria = await _viaticoRepository.ObtenerPorIdAsync(dto.SubcategoriaId);
-
-                    if (subcategoria == null)
-                        throw new BusinessException("La subcategoría especificada no existe.");
-
-                    if (dto.Facturas.Count != subcategoria.FacturasRequeridas)
-                        throw new BusinessException($"La subcategoría '{subcategoria.Nombre}' requiere {subcategoria.FacturasRequeridas} factura(s).");
+                    var proveedor = new ProveedorViatico
+                    {
+                        Ruc = dto.Factura.RucProveedor,
+                        RazonSocial = dto.Factura.ProveedorNombre
+                    };
+                    await _proveedorRepository.CrearAsync(proveedor);
                 }
 
-                foreach (var facturaDTO in dto.Facturas)
-                {
-                    // Mover archivo
-                    var moverArchivoDto = new MoverArchivoDTO
-                    {
-                        RutaRelativaTemporal = facturaDTO.RutaTemporal,
-                        UsuarioAppId = dto.UsuarioAppId,
-                        CicloId = dto.CicloId,
-                        FechaFactura = facturaDTO.FechaFactura,
-                        PrefijoNombre = "factura"
-                    };
-
-                    var rutaFinal = await _archivoRepository.MoverArchivoFinalAsync(moverArchivoDto, webRootPath);
-                    var rutaAbsoluta = Path.Combine(webRootPath, rutaFinal);
-
-                    // Crear proveedor si no existe
-                    if (!await _proveedorRepository.ExistePorRucAsync(facturaDTO.RucProveedor))
-                    {
-                        var proveedor = new ProveedorViatico
-                        {
-                            Ruc = facturaDTO.RucProveedor,
-                            RazonSocial = facturaDTO.ProveedorNombre
-                        };
-                        await _proveedorRepository.CrearAsync(proveedor);
-                    }
-
-                    // Crear factura
-                    var factura = new FacturaViatico
-                    {
-                        NumeroFactura = facturaDTO.NumeroFactura,
-                        FechaFactura = DateTime.SpecifyKind(facturaDTO.FechaFactura, DateTimeKind.Unspecified),
-                        RucProveedor = facturaDTO.RucProveedor,
-                        Subtotal = facturaDTO.Subtotal,
-                        SubtotalIva = facturaDTO.SubtotalIva,
-                        Total = facturaDTO.Total,
-                        RutaImagen = rutaFinal
-                    };
-
-                    facturasFinales.Add(factura);
-                    montoTotal += facturaDTO.Total;
-                }
-
-                // Obtener o crear solicitud
                 var solicitud = await _solicitudRepository.ObtenerPorCicloUsuarioAsync(dto.CicloId, dto.UsuarioAppId);
                 if (solicitud == null)
                 {
@@ -131,32 +87,48 @@ namespace Application.Services
                     await _solicitudRepository.CrearAsync(solicitud);
                 }
 
-                // Crear viático
+                var factura = new FacturaViatico
+                {
+                    NumeroFactura = dto.Factura.NumeroFactura,
+                    FechaFactura = DateTime.SpecifyKind(dto.Factura.FechaFactura, DateTimeKind.Unspecified),
+                    RucProveedor = dto.Factura.RucProveedor,
+                    Subtotal = dto.Factura.Subtotal,
+                    SubtotalIva = dto.Factura.SubtotalIva,
+                    Total = dto.Factura.Total,
+                    RutaImagen = rutaFinal
+                };
+
                 var viatico = new Viatico
                 {
                     CategoriaId = dto.CategoriaId,
-                    SubcategoriaId = dto.SubcategoriaId,
                     Comentario = dto.Comentario,
                     EstadoViatico = EstadoViatico.Borrador,
                     SolicitudViaticoId = solicitud.Id,
                     VehiculoId = dto.VehiculoId
                 };
 
-                // Armar DTO combinado
                 var crearDTO = new CrearViaticoDTO
                 {
                     Viatico = viatico,
-                    Facturas = facturasFinales,
+                    Factura = factura,
                     UsuarioAppId = dto.UsuarioAppId,
                     CicloId = dto.CicloId,
-                    Monto = montoTotal
+                    Monto = dto.Factura.Total
                 };
 
-                solicitud.Monto += montoTotal;
+                // Actualizar el monto con cada inserción de viatico
+                solicitud.Monto += dto.Factura.Total;
                 await _solicitudRepository.ActualizarMontoAsync(solicitud);
 
                 var id = await _viaticoRepository.CrearViaticoAsync(crearDTO);
                 await _unitOfWork.CommitAsync();
+
+                await _eventDispatcher.Dispatch(new ViaticoCreadoEvent(
+                    id,
+                    dto.CategoriaId,
+                    dto.SubcategoriaId,
+                    dto.Factura.Total
+                ));
 
                 return id;
             }
@@ -164,12 +136,8 @@ namespace Application.Services
             {
                 await _unitOfWork.RollbackAsync();
 
-                foreach (var factura in facturasFinales)
-                {
-                    var rutaAbsoluta = Path.Combine(webRootPath, factura.RutaImagen);
-                    if (File.Exists(rutaAbsoluta))
-                        File.Delete(rutaAbsoluta);
-                }
+                if (File.Exists(rutaAbsoluta))
+                    File.Delete(rutaAbsoluta);
 
                 throw;
             }
@@ -340,38 +308,38 @@ namespace Application.Services
 
         public async Task EditarCamposFacturaAsync(int facturaId, EditarViaticoDTO dto)
         {
-            var relacion = await _viaticoRepository.ObtenerRelacionConFacturaYViaticoAsync(facturaId);
 
-            if (relacion == null)
-                throw new BusinessException("La factura no está asociada a ningún viático");
+            var viatico = await _viaticoRepository.GetIdPorFacturaAsync(facturaId);
+            if (viatico == null)
+                throw new Exception("Viático no encontrado");
 
-            var factura = relacion.Factura;
-            var viatico = relacion.Viatico;
+            if (viatico.Factura is null)
+                throw new BusinessException("El viático no tiene una factura asociada");
 
             var eventos = new List<IDomainEvent>();
 
-            if (!string.IsNullOrWhiteSpace(dto.NombreProveedor) && dto.NombreProveedor != factura.Proveedor.RazonSocial)
+            if (!string.IsNullOrWhiteSpace(dto.NombreProveedor) && dto.NombreProveedor != viatico.Factura.Proveedor.RazonSocial)
             {
                 eventos.Add(new FacturaEditadaEvent(
-                    factura.Id,
+                    viatico.Factura.Id,
                     "NombreProveedor",
-                    factura.Proveedor.RazonSocial ?? "",
+                    viatico.Factura.Proveedor.RazonSocial ?? "",
                     dto.NombreProveedor
                 ));
 
-                factura.Proveedor.RazonSocial = dto.NombreProveedor;
+                viatico.Factura.Proveedor.RazonSocial = dto.NombreProveedor;
             }
 
-            if (!string.IsNullOrWhiteSpace(dto.NumeroFactura) && dto.NumeroFactura != factura.NumeroFactura)
+            if (!string.IsNullOrWhiteSpace(dto.NumeroFactura) && dto.NumeroFactura != viatico.Factura.NumeroFactura)
             {
                 eventos.Add(new FacturaEditadaEvent(
-                    factura.Id,
+                    viatico.Factura.Id,
                     "NumeroFactura",
-                    factura.NumeroFactura ?? "",
+                    viatico.Factura.NumeroFactura ?? "",
                     dto.NumeroFactura
                 ));
 
-                factura.NumeroFactura = dto.NumeroFactura;
+                viatico.Factura.NumeroFactura = dto.NumeroFactura;
             }
 
 
@@ -395,20 +363,28 @@ namespace Application.Services
 
         public async Task<IList<HistorialAuditoriaDTO>> ObtenerHistorialViaticoAsync(int viaticoId)
         {
-            // 1) historial directo de viático
-            var historialViatico = await _auditoriaRepository.ObtenerHistorialAsync("Viatico", viaticoId);
-            // 2) historial de facturas relacionadas
-            var facturaIds = await _viaticoRepository.ObtenerIdsFacturasPorViaticoAsync(viaticoId);
+            // Cargar viático con su factura
+            var viatico = await _viaticoRepository
+                .GetIdPorFacturaAsync(viaticoId);
 
-            var historialFacturas = new List<HistorialAuditoriaDTO>();
-            foreach (var fid in facturaIds)
-                historialFacturas.AddRange(await _auditoriaRepository.ObtenerHistorialAsync("Factura", fid));
-            // 3) combinar y ordenar
+            if (viatico == null)
+                throw new BusinessException("Viático no encontrado");
+
+            // Historial del viático
+            var historialViatico = await _auditoriaRepository.ObtenerHistorialAsync("Viatico", viaticoId);
+
+            // Historial de la factura (si existe)
+            var historialFactura = viatico.Factura != null
+                ? await _auditoriaRepository.ObtenerHistorialAsync("Factura", viatico.Factura.Id)
+                : new List<HistorialAuditoriaDTO>();
+
+            // Combinar resultados
             return historialViatico
-                   .Concat(historialFacturas)
-                   .OrderByDescending(h => h.Fecha)
-                   .ToList();
+                .Concat(historialFactura)
+                .OrderByDescending(h => h.Fecha)
+                .ToList();
         }
+
 
         public async Task<List<ViaticoReporteDTO>> ObtenerResumenPorCategoriaAsync(int? cicloId, DateTime? fechaInicio, DateTime? fechaFin)
         {
@@ -475,7 +451,7 @@ namespace Application.Services
 
         public async Task<byte[]> GenerarExcelAsync(int? cicloId, DateTime? fechaInicio, DateTime? fechaFin)
         {
-            var datos = await ObtenerResumenPorCategoriaAsync(cicloId, fechaInicio, fechaFin); // tu método existente
+            var datos = await ObtenerResumenPorCategoriaAsync(cicloId, fechaInicio, fechaFin);
 
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Resumen Viáticos");

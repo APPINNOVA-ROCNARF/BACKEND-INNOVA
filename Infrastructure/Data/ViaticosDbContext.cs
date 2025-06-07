@@ -26,7 +26,6 @@ namespace Infrastructure.Data
         public DbSet<SolicitudVehiculoPrincipal> SolicitudVehiculoPrincipal { get; set; }
         public DbSet<CupoMensual> CupoMensual { get; set; }
         public DbSet<SubcategoriaViatico> SubcategoriaViatico { get; set; }
-        public DbSet<RelacionViaticoFactura> RelacionViaticoFacturas {  get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,6 +67,7 @@ namespace Infrastructure.Data
                 entity.Property(v => v.EstadoViatico)
                       .IsRequired();
 
+
                 entity.Property(v => v.Comentario);
 
                 entity.Property(v => v.CamposRechazados)
@@ -93,24 +93,13 @@ namespace Infrastructure.Data
                       .HasForeignKey(v => v.SubcategoriaId)
                       .OnDelete(DeleteBehavior.SetNull);
 
+                entity.HasOne(v => v.Factura)
+                      .WithOne()
+                      .HasForeignKey<Viatico>(v => v.FacturaId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
             });
 
-            // RELACION VIATICO FACTURAS
-
-            modelBuilder.Entity<RelacionViaticoFactura>(entity =>
-            {
-                entity.HasKey(vf => new { vf.ViaticoId, vf.FacturaId });
-
-                entity.HasOne(vf => vf.Viatico)
-                      .WithMany(v => v.RelacionViaticoFacturas)
-                      .HasForeignKey(vf => vf.ViaticoId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(vf => vf.Factura)
-                      .WithMany(f => f.RelacionViaticoFacturas)
-                      .HasForeignKey(vf => vf.FacturaId)
-                      .OnDelete(DeleteBehavior.Cascade);
-            });
 
             // CATEGORIA
             modelBuilder.Entity<CategoriaViatico>(entity =>
@@ -134,8 +123,6 @@ namespace Infrastructure.Data
                       .HasMaxLength(50)
                       .IsRequired();
 
-                entity.Property(s => s.FacturasRequeridas)
-                      .IsRequired();
 
                 entity.HasOne(s => s.Categoria)
                       .WithMany(c => c.Subcategorias)
@@ -147,7 +134,6 @@ namespace Infrastructure.Data
                         Id = 1,
                         Nombre = "Mantenimiento",
                         CategoriaId = 1,
-                        FacturasRequeridas = 2,
                     }
                 );
             });

@@ -67,9 +67,9 @@ namespace Infrastructure.Repositories
             return archivosGuardados;
         }
 
-        public async Task<string> MoverArchivoFinalAsync(MoverArchivoDTO dto, string webRootPath)
+        public async Task<string> MoverArchivoFinalAsync(MoverArchivoDTO dto, string rutaBase)
         {
-            var rutaTemporalCompleta = Path.Combine(webRootPath, dto.RutaRelativaTemporal);
+            var rutaTemporalCompleta = Path.Combine(rutaBase, dto.RutaRelativaTemporal);
 
             if (!File.Exists(rutaTemporalCompleta))
                 throw new FileNotFoundException("No se encontró el archivo temporal para mover.", rutaTemporalCompleta);
@@ -87,7 +87,7 @@ namespace Infrastructure.Repositories
                 nombreFinal
             ).Replace("\\", "/");
 
-            var rutaFinalCompleta = Path.Combine(webRootPath, rutaRelativaFinal);
+            var rutaFinalCompleta = Path.Combine(rutaBase, rutaRelativaFinal);
 
             Directory.CreateDirectory(Path.GetDirectoryName(rutaFinalCompleta)!);
             File.Move(rutaTemporalCompleta, rutaFinalCompleta);

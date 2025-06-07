@@ -10,7 +10,7 @@ namespace Application.Interfaces.IViatico
 {
     public interface IViaticoService
     {
-        Task<int> CrearViaticoAsync(ViaticoCrearDTO dto, string webRootPath);
+        Task<int> CrearViaticoAsync(ViaticoCrearDTO dto, string rutaBase);
 
         Task<EstadisticaSolicitudViaticoDTO> ObtenerEstadisticaSolicitudViaticoAsync(int cicloId);
         Task<List<EstadisticaViaticoDTO>> ObtenerEstadisticaViaticoAsync(int solicitudId);

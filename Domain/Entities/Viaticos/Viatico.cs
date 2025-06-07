@@ -26,6 +26,7 @@ namespace Domain.Entities.Viaticos
 
         public List<CampoRechazado>? CamposRechazados { get; set; }
         public decimal Monto { get; set; }
-        public ICollection<RelacionViaticoFactura> RelacionViaticoFacturas { get; set; }
+        public int FacturaId { get; set; }
+        public FacturaViatico Factura {  get; set; }
     }
 }

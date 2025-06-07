@@ -20,43 +20,23 @@ namespace Infrastructure.Repositories
 
         public async Task<int> CrearViaticoAsync(CrearViaticoDTO dto)
         {
-            var facturasValidadas = new List<FacturaViatico>();
+            bool facturaDuplicada = await _context.FacturasViatico.AnyAsync(f =>
+                   f.NumeroFactura == dto.Factura.NumeroFactura &&
+                   f.RucProveedor == dto.Factura.RucProveedor);
 
-            foreach (var factura in dto.Facturas)
+            if (facturaDuplicada)
             {
-                var facturaExistente = await _context.FacturasViatico
-                    .FirstOrDefaultAsync(f =>
-                        f.NumeroFactura == factura.NumeroFactura &&
-                        f.RucProveedor == factura.RucProveedor);
-
-                if (facturaExistente != null)
-                {
-                    // También podrías validar si ya fue usada en otro viático
-                    throw new InvalidOperationException($"Ya existe una factura con número {factura.NumeroFactura} y RUC {factura.RucProveedor}.");
-                }
-
-                facturasValidadas.Add(factura);
-                _context.FacturasViatico.Add(factura);
+                throw new InvalidOperationException("Ya existe una factura con ese número y RUC.");
             }
 
-            var nuevoViatico = dto.Viatico;
-            nuevoViatico.Monto = dto.Monto;
+            dto.Viatico.Factura = dto.Factura;
 
-            _context.Viaticos.Add(nuevoViatico);
-            await _context.SaveChangesAsync(); // Para obtener el ID del viático y las facturas
+            dto.Viatico.Monto = dto.Monto;
 
-            foreach (var factura in facturasValidadas)
-            {
-                _context.RelacionViaticoFacturas.Add(new RelacionViaticoFactura
-                {
-                    ViaticoId = nuevoViatico.Id,
-                    FacturaId = factura.Id
-                });
-            }
-
+            _context.Viaticos.Add(dto.Viatico);
             await _context.SaveChangesAsync();
 
-            return nuevoViatico.Id;
+            return dto.Viatico.Id;
         }
 
         public async Task<EstadisticaSolicitudViaticoDTO?> ObtenerEstadisticaSolicitudViaticoAsync(int cicloId)
@@ -79,49 +59,36 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<ViaticoListDTO>> ObtenerViaticosPorSolicitudAsync(int solicitudId)
         {
-            var viaticos = await _context.Viaticos
-                .Include(v => v.RelacionViaticoFacturas)
-                    .ThenInclude(vf => vf.Factura)
-                        .ThenInclude(f => f.Proveedor)
+            return await _context.Viaticos
+                .Include(v => v.Factura)
+                    .ThenInclude(f => f.Proveedor)
                 .Include(v => v.Categoria)
-                .Include(v => v.Subcategoria)
                 .Include(v => v.Vehiculo)
                 .Where(v => v.SolicitudViaticoId == solicitudId)
                 .OrderByDescending(v => v.FechaModificado)
+                .Select(v => new ViaticoListDTO
+                {
+                    Id = v.Id,
+                    FechaFactura = v.Factura != null ? v.Factura.FechaFactura : DateTime.MinValue,
+                    NombreCategoria = v.Categoria.Nombre,
+                    NombreProveedor = v.Factura != null ? v.Factura.Proveedor.RazonSocial : string.Empty,
+                    NumeroFactura = v.Factura != null ? v.Factura.NumeroFactura : string.Empty,
+                    Comentario = v.Comentario,
+                    Monto = v.Factura != null ? v.Factura.Total : 0,
+                    EstadoViatico = v.EstadoViatico.ToFriendlyString(),
+                    RutaImagen = v.Factura != null ? v.Factura.RutaImagen : string.Empty,
+                    CamposRechazados = v.CamposRechazados,
+                    Vehiculo = v.Categoria.Nombre == "Movilización" && v.Vehiculo != null
+                        ? new VehiculoViaticoDTO
+                        {
+                            Placa = v.Vehiculo.Placa,
+                            Modelo = v.Vehiculo.Modelo,
+                            Color = v.Vehiculo.Color,
+                            Fabricante = v.Vehiculo.Fabricante
+                        }
+                : null
+                })
                 .ToListAsync();
-
-            return viaticos.Select(v => new ViaticoListDTO
-            {
-                Id = v.Id,
-                NombreCategoria = v.Categoria.Nombre,
-                NombreSubcategoria = v.Subcategoria?.Nombre,
-                Comentario = v.Comentario,
-                EstadoViatico = v.EstadoViatico.ToString(),
-                CamposRechazados = v.CamposRechazados,
-                Vehiculo = v.Categoria.Nombre == "Movilización" && v.Vehiculo != null
-                    ? new VehiculoViaticoDTO
-                    {
-                        Placa = v.Vehiculo.Placa,
-                        Modelo = v.Vehiculo.Modelo,
-                        Color = v.Vehiculo.Color,
-                        Fabricante = v.Vehiculo.Fabricante
-                    }
-                    : null,
-
-                Facturas = v.RelacionViaticoFacturas?
-                    .Select(vf => vf.Factura)
-                    .Select(f => new FacturaDTO
-                    {
-                        Id = f.Id,
-                        NumeroFactura = f.NumeroFactura,
-                        FechaFactura = f.FechaFactura,
-                        ProveedorNombre = f.Proveedor?.RazonSocial ?? "",
-                        RucProveedor = f.RucProveedor,
-                        Monto = f.Total,
-                        RutaImagen = f.RutaImagen
-                    })
-                    .ToList() ?? new List<FacturaDTO>()
-            }).ToList();
         }
 
         public async Task<List<Viatico>> ObtenerViaticosPorIdsAsync(List<int> ids)
@@ -137,14 +104,12 @@ namespace Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<RelacionViaticoFactura?> ObtenerRelacionConFacturaYViaticoAsync(int facturaId)
+        public async Task<Viatico?> GetIdPorFacturaAsync(int id)
         {
-            return await _context.RelacionViaticoFacturas
-                .Include(vf => vf.Factura)
+            return await _context.Viaticos
+                .Include(v => v.Factura)
                     .ThenInclude(f => f.Proveedor)
-                .Include(vf => vf.Viatico)
-                    .ThenInclude(v => v.SolicitudViatico)
-                .FirstOrDefaultAsync(vf => vf.FacturaId == facturaId);
+                .FirstOrDefaultAsync(v => v.Id == id);
         }
 
         public void MarcarModificado<T>(T entidad) where T : class, IModificado
@@ -152,7 +117,7 @@ namespace Infrastructure.Repositories
             _context.Entry(entidad).Property(e => e.FechaModificado).IsModified = true;
         }
 
-        public async Task<SubcategoriaViatico?> ObtenerPorIdAsync(int? id)
+        public async Task<SubcategoriaViatico?> ObtenerSubcategoriaPorIdAsync(int? id)
         {
             return await _context.SubcategoriaViatico
                 .AsNoTracking()
@@ -164,13 +129,7 @@ namespace Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<int>> ObtenerIdsFacturasPorViaticoAsync(int viaticoId)
-        {
-            return await _context.RelacionViaticoFacturas
-                .Where(vf => vf.ViaticoId == viaticoId)
-                .Select(vf => vf.FacturaId)
-                .ToListAsync();
-        }
+
 
         public async Task<List<Viatico>> ObtenerConSolicitudYCategoriaPorFiltroAsync(int? cicloId, DateTime? fechaInicio, DateTime? fechaFin)
         {

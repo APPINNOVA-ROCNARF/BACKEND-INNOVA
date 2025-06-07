@@ -29,14 +29,14 @@ namespace BackendAPI.Controllers.Viatico
         [HttpPost]
         public async Task<IActionResult> CrearViatico([FromBody] ViaticoCrearDTO dto)
         {
-            if (dto == null || dto.Facturas == null)
+            if (dto == null || dto.Factura == null)
                 return BadRequest("Datos incompletos.");
 
             try
             {
-                var webRootPath = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                var rutaBase = Path.Combine(_env.ContentRootPath, "Storage");
 
-                var viaticoId = await _viaticoService.CrearViaticoAsync(dto, webRootPath);
+                var viaticoId = await _viaticoService.CrearViaticoAsync(dto, rutaBase);
 
                 return Ok(new
                 {

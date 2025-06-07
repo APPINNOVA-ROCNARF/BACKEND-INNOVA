@@ -14,6 +14,7 @@ namespace Application.DTO.GuiaProductoDTO
         public string Nombre { get; set; } = string.Empty;
         public string UrlVideo { get; set; } = string.Empty;
         public int FuerzaId { get; set; }
+        public Boolean Activo { get; set; }
         public List<ArchivoTemporalGuardadoDTO> Archivos { get; set; } = new();
     }
 }
