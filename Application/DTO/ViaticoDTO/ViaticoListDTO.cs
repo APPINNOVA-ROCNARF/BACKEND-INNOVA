@@ -14,6 +14,7 @@ namespace Application.DTO.ViaticoDTO
         public decimal Monto { get; set; }
         public string EstadoViatico { get; set; } = string.Empty;
         public string RutaImagen { get; set; } = string.Empty;
+        public int FacturaId { get; set; }
         public List<CampoRechazado>? CamposRechazados { get; set; }
         public VehiculoViaticoDTO? Vehiculo { get; set; }
     }

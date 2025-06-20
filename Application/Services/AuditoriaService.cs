@@ -59,7 +59,7 @@ namespace Application.Services
                 auditoria.Fecha = DateTime.UtcNow;
                 auditoria.Datos = datosJson;
                 auditoria.EntidadAfectada = evento.Entidad;
-                auditoria.EntidadId = evento.EntidadId;
+                auditoria.EntidadId = (int)evento.EntidadId;
                 auditoria.UsuarioId = usuario.Id;
                 auditoria.UsuarioNombre = usuario.Nombre;
                 auditoria.IpCliente = ip;

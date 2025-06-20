@@ -16,6 +16,5 @@ namespace Domain.Entities.Sistema
         public string? NombreArchivo { get; set; }
         public string? ExtensionArchivo { get; set; }
         public string? UrlArchivo { get; set; }
-
     }
 }

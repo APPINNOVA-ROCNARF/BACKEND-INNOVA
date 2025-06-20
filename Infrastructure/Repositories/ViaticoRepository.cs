@@ -1,5 +1,6 @@
 ﻿using Application.DTO.VehiculoDTO;
 using Application.DTO.ViaticoDTO;
+using Application.DTO.ViaticoDTO.mobile;
 using Application.Helpers;
 using Application.Interfaces.IViatico;
 using Domain.Common;
@@ -75,8 +76,9 @@ namespace Infrastructure.Repositories
                     NumeroFactura = v.Factura != null ? v.Factura.NumeroFactura : string.Empty,
                     Comentario = v.Comentario,
                     Monto = v.Factura != null ? v.Factura.Total : 0,
-                    EstadoViatico = v.EstadoViatico.ToFriendlyString(),
+                    EstadoViatico = v.EstadoViatico.ToString(),
                     RutaImagen = v.Factura != null ? v.Factura.RutaImagen : string.Empty,
+                    FacturaId = v.FacturaId,
                     CamposRechazados = v.CamposRechazados,
                     Vehiculo = v.Categoria.Nombre == "Movilización" && v.Vehiculo != null
                         ? new VehiculoViaticoDTO
@@ -156,5 +158,31 @@ namespace Infrastructure.Repositories
                 .Where(c => usuarioIds.Contains(c.UsuarioId) && ciclosIds.Contains(c.CicloId))
                 .ToListAsync();
         }
+
+        // APP MOVIL
+
+        public async Task<IEnumerable<AppViaticoListDTO>> ObtenerViaticosApp(int solicitudId)
+        {
+            return await _context.Viaticos
+                .Include(v => v.Factura)
+                    .ThenInclude(f => f.Proveedor)
+                .Include(v => v.Categoria)
+                .Where(v => v.SolicitudViaticoId == solicitudId)
+                .OrderByDescending(v => v.FechaModificado)
+                .Select(v => new AppViaticoListDTO
+                {
+                    Id = v.Id,
+                    FechaFactura = v.Factura != null ? v.Factura.FechaFactura : DateTime.MinValue,
+                    NombreCategoria = v.Categoria.Nombre,
+                    NombreSubcategoria = v.Subcategoria.Nombre,
+                    NombreProveedor = v.Factura != null ? v.Factura.Proveedor.RazonSocial : string.Empty,
+                    Comentario = v.Comentario,
+                    Monto = v.Factura != null ? v.Factura.Total : 0,
+                    EstadoViatico = v.EstadoViatico.ToString()
+                })
+                .ToListAsync();
+        }
     }
+
+
 }

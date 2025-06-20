@@ -14,12 +14,12 @@ namespace Domain.Entities.Auditoria
 
         public DateTime Fecha { get; set; } = DateTime.UtcNow;
 
-        public int? UsuarioId { get; set; }
-        public string? UsuarioNombre { get; set; }
+        public int UsuarioId { get; set; }
+        public string UsuarioNombre { get; set; }
 
-        public string? EntidadAfectada { get; set; }
+        public string EntidadAfectada { get; set; }
 
-        public int? EntidadId { get; set; }
+        public int EntidadId { get; set; }
 
         public string Datos { get; set; } = null!;
 

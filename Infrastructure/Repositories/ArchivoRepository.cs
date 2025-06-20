@@ -152,6 +152,31 @@ namespace Infrastructure.Repositories
             return rutaRelativaFinal;
         }
 
+        public async Task<string> MoverArchivosTablaBonificacionesAsync(MoverArchivoGuiaDTO archivo, int tablaBonificacionesId, string rutaBase)
+        {
+            var rutaTemporalCompleta = Path.Combine(rutaBase, archivo.RutaTemporal);
+
+            if (!File.Exists(rutaTemporalCompleta))
+                throw new FileNotFoundException("Archivo no encontrado: " + archivo.RutaTemporal);
+
+            var extension = Path.GetExtension(archivo.RutaTemporal);
+            var nombreFinal = $"{Path.GetFileNameWithoutExtension(archivo.NombreOriginal)}_{Guid.NewGuid()}{extension}";
+
+            var rutaRelativaFinal = Path.Combine(
+                _opciones.RutaBase,
+                "tabla-bonificaciones",
+                tablaBonificacionesId.ToString(),
+                nombreFinal
+            ).Replace("\\", "/");
+
+            var rutaFinalCompleta = Path.Combine(rutaBase, rutaRelativaFinal);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(rutaFinalCompleta)!);
+            File.Move(rutaTemporalCompleta, rutaFinalCompleta);
+
+            return rutaRelativaFinal;
+        }
+
     }
 
 }

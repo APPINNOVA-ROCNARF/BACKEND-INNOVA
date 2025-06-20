@@ -1,4 +1,5 @@
 ﻿using Application.DTO.ArchivoDTO;
+using Application.Exceptions;
 using Application.Helpers;
 using Application.Interfaces.IArchivo;
 using Application.Options;
@@ -70,44 +71,27 @@ namespace BackendAPI.Controllers.Archivos
             return Ok(resultado);
         }
 
-        [HttpGet("descargar")]
-        public IActionResult DescargarArchivo([FromQuery] string rutaRelativa, [FromQuery] string? modo = "ver")
+        /*[HttpGet("descargar")]
+        public IActionResult DescargarArchivo(
+            [FromQuery] string rutaRelativa,
+            [FromQuery] string? modo = "ver",
+            [FromQuery] string? modulo = "general")
         {
-            if (string.IsNullOrWhiteSpace(rutaRelativa))
-                return BadRequest("Ruta no válida.");
-
-            if (rutaRelativa.Contains(".."))
-                return BadRequest("Ruta no permitida.");
-
-            rutaRelativa = Uri.UnescapeDataString(rutaRelativa);
-            rutaRelativa = rutaRelativa.TrimStart('/');
-
-            var rutaCompleta = Path.Combine(_env.ContentRootPath, "Storage", rutaRelativa.Replace("/", Path.DirectorySeparatorChar.ToString()));
-
-            if (!System.IO.File.Exists(rutaCompleta))
-                return NotFound("Archivo no encontrado.");
-
-            var extension = Path.GetExtension(rutaCompleta).ToLowerInvariant();
-            var mime = extension switch
+            try
             {
-                ".jpg" or ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                ".gif" => "image/gif",
-                ".pdf" => "application/pdf",
-                ".txt" => "text/plain",
-                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                _ => "application/octet-stream"
-            };
-
-            var contenido = System.IO.File.ReadAllBytes(rutaCompleta);
-            var nombreArchivo = Path.GetFileName(rutaRelativa);
-            var encodedFileName = Uri.EscapeDataString(nombreArchivo);
-
-            var disposition = modo?.ToLowerInvariant() == "descargar" ? "attachment" : "inline";
-
-            return File(contenido, mime, disposition == "attachment" ? nombreArchivo : null);
+                var archivo = _archivoService.ObtenerArchivo(rutaRelativa, _env.ContentRootPath, modo, modulo);
+                var disposition = archivo.Modo.ToLowerInvariant() == "descargar" ? "attachment" : "inline";
+                return File(archivo.Contenido, archivo.Mime, disposition == "attachment" ? archivo.Nombre : null);
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (FileNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
-
+        */
     }
 }

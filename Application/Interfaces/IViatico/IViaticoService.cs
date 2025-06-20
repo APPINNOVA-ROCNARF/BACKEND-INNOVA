@@ -1,5 +1,6 @@
 ﻿using Application.Audit;
 using Application.DTO.ViaticoDTO;
+using Application.DTO.ViaticoDTO.mobile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,12 @@ namespace Application.Interfaces.IViatico
         Task<IList<HistorialAuditoriaDTO>> ObtenerHistorialViaticoAsync(int viaticoId);
         Task<List<ViaticoReporteDTO>> ObtenerResumenPorCategoriaAsync(int? cicloId, DateTime? fechaInicio, DateTime? fechaFin);
         Task<byte[]> GenerarExcelAsync(int? cicloId, DateTime? fechaInicio, DateTime? fechaFin);
+        Task<Dictionary<int, bool>> ObtenerFacturasVistasAsync(List<int> facturaIds);
+
+        // APP MOVIL
+
+        Task<IEnumerable<AppViaticoListDTO>> ObtenerViaticosPorUsuarioApp(string nombreUsuario, int cicloId);
+
 
     }
 }

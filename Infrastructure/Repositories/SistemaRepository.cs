@@ -7,6 +7,7 @@ using Application.DTO.ArchivoDTO;
 using Application.DTO.GuiaProductoDTO;
 using Application.DTO.ParrillaPromocionalDTO;
 using Application.DTO.SistemaDTO;
+using Application.DTO.TablaBonificacionesDTO;
 using Application.Interfaces.IArchivo;
 using Application.Interfaces.ISistema;
 using Domain.Entities.Sistema;
@@ -29,6 +30,7 @@ namespace Infrastructure.Repositories
         public async Task<List<CicloSelectDTO>> ObtenerCiclosSelectAsync()
         {
             return await _context.Ciclos
+                .OrderByDescending(c => c.FechaInicio)
                 .Select(c => new CicloSelectDTO
                 {
                     Id = c.Id,
@@ -105,6 +107,30 @@ namespace Infrastructure.Repositories
                     Activo = g.Activo
                 })
                 .ToListAsync();
+        }
+
+        public async Task<GuiaProductoSelectsDTO> ObtenerSelectsAsync()
+        {
+            var nombres = await _context.GuiasProducto
+                .Select(g => g.Nombre)
+                .Distinct()
+                .OrderBy(n => n)
+                .ToListAsync();
+
+            var marcas = await _context.GuiasProducto
+                .Select(g => g.Marca)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToListAsync();
+
+            var nombresDTO = nombres.Select((n, i) => new SelectItemDTO { Id = i + 1, Nombre = n }).ToList();
+            var marcasDTO = marcas.Select((m, i) => new SelectItemDTO { Id = i + 1, Nombre = m }).ToList();
+
+            return new GuiaProductoSelectsDTO
+            {
+                Nombres = nombresDTO,
+                Marcas = marcasDTO,
+            };
         }
 
         public async Task<GuiaProductoDetalleDTO?> ObtenerGuiaDetalleAsync(int id)
@@ -284,5 +310,102 @@ namespace Infrastructure.Repositories
             _context.ParrillasPromocional.Update(parrilla);
             await _context.SaveChangesAsync();
         }
+
+        // Tabla Bonificaciones
+
+        public async Task<int> GuardarTablaBonificacionesAsync(CrearTablaBonificacionesDTO dto, string rutaBase)
+        {
+            string? rutaFinal = null;
+
+            try
+            {
+                var existente = await _context.TablaBonificaciones.FirstOrDefaultAsync();
+                var esNuevo = existente == null;
+
+                var tabla = existente ?? new TablaBonificaciones();
+
+                tabla.Nombre = dto.Nombre;
+                tabla.Descripcion = dto.Descripcion;
+                tabla.FechaModificado = DateTime.UtcNow;
+
+                if (dto.Archivo != null)
+                {
+                    // Si ya hay archivo anterior, eliminarlo
+                    if (!esNuevo && !string.IsNullOrEmpty(tabla.UrlArchivo))
+                    {
+                        var pathAnterior = Path.Combine(rutaBase, tabla.UrlArchivo);
+                        if (File.Exists(pathAnterior))
+                        {
+                            File.Delete(pathAnterior);
+                        }
+                    }
+
+                    // Mover nuevo archivo
+                    var moverDto = new MoverArchivoGuiaDTO
+                    {
+                        RutaTemporal = dto.Archivo.RutaTemporal,
+                        NombreOriginal = dto.Archivo.NombreOriginal
+                    };
+
+                    rutaFinal = await _archivoRepository.MoverArchivosTablaBonificacionesAsync(
+                        moverDto, tabla.Id == 0 ? 1 : tabla.Id, rutaBase);
+
+                    tabla.NombreArchivo = dto.Archivo.NombreOriginal;
+                    tabla.ExtensionArchivo = dto.Archivo.Extension;
+                    tabla.UrlArchivo = rutaFinal;
+                }
+
+                if (esNuevo)
+                    _context.TablaBonificaciones.Add(tabla);
+                else
+                    _context.TablaBonificaciones.Update(tabla);
+
+                await _context.SaveChangesAsync();
+                return tabla.Id;
+            }
+            catch (Exception ex)
+            {
+                // Si algo falla y ya se movió el archivo, lo eliminamos
+                if (!string.IsNullOrEmpty(rutaFinal))
+                {
+                    var pathCompleto = Path.Combine(rutaBase, rutaFinal);
+                    if (File.Exists(pathCompleto))
+                        File.Delete(pathCompleto);
+                }
+
+                throw new Exception("Error al guardar la tabla de bonificaciones.", ex);
+            }
+        }
+
+        public async Task<TablaBonificaciones?> ObtenerTablaBonificacionesAsync()
+        {
+            return await _context.TablaBonificaciones.FirstOrDefaultAsync();
+        }
+
+        public async Task EliminarArchivoTablaBonificacionesAsync(string rutaBase)
+        {
+            var tabla = await _context.TablaBonificaciones.FirstOrDefaultAsync();
+
+            if (tabla == null)
+                throw new InvalidOperationException("No existe una tabla registrada.");
+
+            if (string.IsNullOrWhiteSpace(tabla.UrlArchivo))
+                throw new FileNotFoundException("No hay archivo registrado para eliminar.");
+
+            var rutaCompleta = Path.Combine(rutaBase, tabla.UrlArchivo);
+
+            if (!File.Exists(rutaCompleta))
+                throw new FileNotFoundException("El archivo no existe en el sistema de archivos.");
+
+            File.Delete(rutaCompleta);
+
+            tabla.NombreArchivo = null;
+            tabla.ExtensionArchivo = null;
+            tabla.UrlArchivo = null;
+
+            _context.TablaBonificaciones.Update(tabla);
+            await _context.SaveChangesAsync();
+        }
     }
 }
+

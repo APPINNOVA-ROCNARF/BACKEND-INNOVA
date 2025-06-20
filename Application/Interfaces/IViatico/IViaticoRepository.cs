@@ -1,4 +1,5 @@
 ﻿using Application.DTO.ViaticoDTO;
+using Application.DTO.ViaticoDTO.mobile;
 using Domain.Common;
 using Domain.Entities.Viaticos;
 using System;
@@ -23,5 +24,9 @@ namespace Application.Interfaces.IViatico
         Task<Viatico?> GetIdPorFacturaAsync(int id);
         Task<List<Viatico>> ObtenerConSolicitudYCategoriaPorFiltroAsync(int? cicloId, DateTime? fechaInicio, DateTime? fechaFin);
         Task<List<CupoMensual>> ObtenerCuposMensualesAsync(List<int> usuarioIds, List<int> ciclosIds);
+
+        // APP MOVIL
+        Task<IEnumerable<AppViaticoListDTO>> ObtenerViaticosApp(int solicitudId);
+
     }
 }

@@ -17,6 +17,7 @@ namespace Application.Interfaces.IArchivo
     string rutaBase);
 
         Task<string> MoverArchivosParrillaPromocionalAsync(MoverArchivoGuiaDTO archivo, int parrillaPromocionalId, string rutaBase);
+        Task<string> MoverArchivosTablaBonificacionesAsync(MoverArchivoGuiaDTO archivo, int tablaBonificacionesId, string rutaBase);
     }
 
 }

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.DTO.ViaticoDTO;
+using Application.Exceptions;
 using Application.Interfaces.IViatico;
+using Domain.Entities.Usuarios;
 using Domain.Entities.Viaticos;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -22,8 +24,13 @@ namespace Infrastructure.Repositories
 
         public async Task<SolicitudViatico?> ObtenerPorCicloUsuarioAsync(int cicloId, int usuarioAppId)
         {
-            return await _context.SolicitudesViatico
+            var solicitud = await _context.SolicitudesViatico
                 .FirstOrDefaultAsync(s => s.CicloId == cicloId && s.UsuarioAppId == usuarioAppId);
+
+            if (solicitud == null)
+                throw new NotFoundException($"No se encontró una solicitud con el usuario para ese usuario en ese ciclo.");
+
+            return solicitud;
         }
 
         public async Task CrearAsync(SolicitudViatico solicitud)

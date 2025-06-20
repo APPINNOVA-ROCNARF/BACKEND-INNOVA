@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Application.DTO.GuiaProductoDTO;
 using Application.DTO.ParrillaPromocionalDTO;
 using Application.DTO.SistemaDTO;
+using Application.DTO.TablaBonificacionesDTO;
 using Domain.Entities.Sistema;
 
 namespace Application.Interfaces.ISistema
@@ -21,6 +22,8 @@ namespace Application.Interfaces.ISistema
         Task<int> InsertarAsync(GuiaProducto guia);
         Task InsertarArchivosAsync(IEnumerable<ArchivoGuiaProducto> archivos);
         Task<List<GuiaProductoDTO>> ObtenerGuiasProductoAsync();
+        Task<GuiaProductoSelectsDTO> ObtenerSelectsAsync();
+
         Task<GuiaProductoDetalleDTO?> ObtenerGuiaDetalleAsync(int id);
         Task EliminarGuiaAsync(int id, string rutaBase);
         Task<GuiaProducto?> ObtenerGuiaPorIdAsync(int id);
@@ -31,5 +34,10 @@ namespace Application.Interfaces.ISistema
         Task<int> GuardarParrillaPromocionalAsync(CrearParrillaPromocionalDTO dto, string rutaBase);
         Task<ParrillaPromocional?> ObtenerParrillaAsync();
         Task EliminarArchivoParrillaAsync(string rutaBase);
+
+        //TABLA BONIFICACIONES
+        Task<int> GuardarTablaBonificacionesAsync(CrearTablaBonificacionesDTO dto, string rutaBase);
+        Task<TablaBonificaciones?> ObtenerTablaBonificacionesAsync();
+        Task EliminarArchivoTablaBonificacionesAsync(string rutaBase);
     }
 }

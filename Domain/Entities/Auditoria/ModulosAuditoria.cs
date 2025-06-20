@@ -9,5 +9,6 @@ namespace Domain.Entities.Auditoria
     public static class ModulosAuditoria
     {
         public const string Viaticos = "viaticos";
+        public const string Sistema = "sistema";
     }
 }

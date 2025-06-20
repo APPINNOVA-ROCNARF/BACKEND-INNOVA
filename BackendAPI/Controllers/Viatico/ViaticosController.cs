@@ -1,28 +1,32 @@
 ﻿using Application.Audit;
 using Application.DTO.PresupuestoViaticoDTO;
 using Application.DTO.ViaticoDTO;
+using Application.Interfaces.IArchivo;
 using Application.Interfaces.IPresupuestoViatico;
 using Application.Interfaces.IViatico;
+using Domain.Entities.Auditoria;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendAPI.Controllers.Viatico
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class ViaticosController : ControllerBase
     {
         private readonly IViaticoService _viaticoService;
         private readonly ISolicitudViaticoService _solicitudViaticoService;
         private readonly ICupoMensualService _cupoMensualService;
-        private readonly IAuditoriaService _auditoriaService;
+        private readonly IArchivoService _archivoService;
         private readonly IWebHostEnvironment _env;
 
-        public ViaticosController(IViaticoService viaticoService, ISolicitudViaticoService solicitudViaticoService, ICupoMensualService cupoMensualService, IAuditoriaService auditoriaService, IWebHostEnvironment env)
+        public ViaticosController(IViaticoService viaticoService, ISolicitudViaticoService solicitudViaticoService, ICupoMensualService cupoMensualService, IArchivoService archivoService, IWebHostEnvironment env)
         {
             _viaticoService = viaticoService;
             _solicitudViaticoService = solicitudViaticoService;
             _cupoMensualService = cupoMensualService;
-            _auditoriaService = auditoriaService;
+            _archivoService = archivoService;
             _env = env;
         }
 
@@ -177,6 +181,20 @@ namespace BackendAPI.Controllers.Viatico
             return File(excelBytes,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "resumen_viaticos.xlsx");
+        }
+
+        [HttpGet("factura/ver")]
+        public IActionResult VerFactura([FromQuery] string rutaRelativa, [FromQuery] int entidadId )
+        {
+            var archivo = _archivoService.ObtenerArchivo(rutaRelativa, _env.ContentRootPath, "Factura", entidadId, "ver", ModulosAuditoria.Viaticos);
+            return File(archivo.Contenido, archivo.Mime, null);
+        }
+
+        [HttpPost("factura/vistas")]
+        public async Task<ActionResult<Dictionary<int, bool>>> ObtenerFacturasVistas([FromBody] List<int> facturaIds)
+        {
+            var result = await _viaticoService.ObtenerFacturasVistasAsync(facturaIds);
+            return Ok(result);
         }
     }
 }

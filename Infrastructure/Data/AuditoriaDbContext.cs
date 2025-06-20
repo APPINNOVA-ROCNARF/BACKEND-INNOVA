@@ -16,10 +16,12 @@ namespace Infrastructure.Data
         }
 
         public DbSet<AuditoriaViaticos> AuditoriaViaticos { get; set; }
+        public DbSet<AuditoriaSistema> AuditoriaSistema { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureAuditoria<AuditoriaViaticos>(modelBuilder, "AuditoriaViaticos");
+            ConfigureAuditoria<AuditoriaSistema>(modelBuilder, "AuditoriaSistema");
         }
 
         private void ConfigureAuditoria<T>(ModelBuilder modelBuilder, string tableName)

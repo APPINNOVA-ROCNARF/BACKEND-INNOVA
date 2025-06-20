@@ -22,8 +22,6 @@ namespace Infrastructure.Data
         public DbSet<Vehiculo> Vehiculos { get; set; }
         public DbSet<EstadisticaSolicitudViaticoDTO> EstadisticaSolicitudViatico { get; set; }
         public DbSet<EstadisticaViaticoDTO> EstadisticaViatico { get; set; }
-        public DbSet<VehiculoPrincipal> VehiculoPrincipal { get; set; }
-        public DbSet<SolicitudVehiculoPrincipal> SolicitudVehiculoPrincipal { get; set; }
         public DbSet<CupoMensual> CupoMensual { get; set; }
         public DbSet<SubcategoriaViatico> SubcategoriaViatico { get; set; }
 
@@ -197,58 +195,6 @@ namespace Infrastructure.Data
 
                 entity.HasIndex(v => v.Placa )
                       .IsUnique(); 
-            });
-
-            modelBuilder.Entity<VehiculoPrincipal>(entity =>
-            {
-                entity.HasKey(vp => vp.UsuarioAppId);
-
-                entity.Property(vp => vp.UsuarioAppId)
-                      .ValueGeneratedNever();
-
-                entity.Property(vp => vp.FechaModificado)
-                      .HasColumnType("timestamp without time zone")
-                      .IsRequired();
-
-                entity.HasOne(vp => vp.Vehiculo)
-                      .WithMany()
-                      .HasForeignKey(vp => vp.VehiculoId)
-                      .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<SolicitudVehiculoPrincipal>(entity =>
-            {
-                entity.HasKey(s => s.Id);
-
-                entity.Property(s => s.UsuarioAppId)
-                      .IsRequired();
-
-                entity.Property(s => s.VehiculoIdSolicitado)
-                      .IsRequired();
-
-                entity.Property(s => s.Motivo)
-                      .HasMaxLength(500)
-                      .IsRequired();
-
-                entity.Property(s => s.FechaRegistro)
-                      .HasColumnType("timestamp without time zone")
-                      .IsRequired();
-
-                entity.Property(s => s.Estado)
-                      .HasConversion<int>()
-                      .IsRequired();
-
-                entity.Property(s => s.AprobadoPorUsuarioId)
-                      .IsRequired(false); 
-
-                entity.Property(s => s.FechaAprobacion)
-                      .HasColumnType("timestamp without time zone")
-                      .IsRequired(false);
-
-                entity.HasOne(s => s.Vehiculo)
-                      .WithMany()
-                      .HasForeignKey(s => s.VehiculoIdSolicitado)
-                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<CupoMensual>(entity =>

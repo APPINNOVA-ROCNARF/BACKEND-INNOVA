@@ -10,5 +10,7 @@ namespace Application.Interfaces.IArchivo
     public interface IArchivoService
     {
         Task<string> SubirArchivoTempAsync(ArchivoUploadDTO archivoDto, string rutaBase);
+        ArchivoResultadoDTO ObtenerArchivo(string rutaRelativa, string rootPath, string entidad, int entidadId, string? modo = "ver", string? modulo = "general");
+
     }
 }

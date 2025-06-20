@@ -5,11 +5,7 @@ using Application.Interfaces.IUsuario;
 using Domain.Entities.Usuarios;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Infrastructure.Repositories
 {
@@ -45,6 +41,7 @@ namespace Infrastructure.Repositories
             return await _context.UsuariosApp
                 .Where(ua => ua.Usuario.Estado)
                 .Include(ua => ua.Usuario)
+                .OrderBy(ua => ua.Usuario.Nombre)
                 .Select(ua => new UsuarioAppSelectDTO
                 {
                     Id = ua.Id,
@@ -132,6 +129,7 @@ namespace Infrastructure.Repositories
                 .Select(u => (int?)u.Id)
                 .FirstOrDefaultAsync();
         }
+
     }
 
 }

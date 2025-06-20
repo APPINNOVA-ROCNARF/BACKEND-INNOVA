@@ -7,6 +7,7 @@ using Application.DTO.ArchivoDTO;
 using Application.DTO.GuiaProductoDTO;
 using Application.DTO.ParrillaPromocionalDTO;
 using Application.DTO.SistemaDTO;
+using Application.DTO.TablaBonificacionesDTO;
 using Application.Interfaces.IArchivo;
 using Application.Interfaces.ISistema;
 using Domain.Entities.Sistema;
@@ -110,6 +111,11 @@ namespace Application.Services
             return _repository.ObtenerGuiasProductoAsync();
         }
 
+        public async Task<GuiaProductoSelectsDTO> ObtenerSelectsAsync()
+        {
+            return await _repository.ObtenerSelectsAsync();
+        }
+
         public Task<GuiaProductoDetalleDTO?> ObtenerGuiaDetalleAsync(int id)
         {
             return _repository.ObtenerGuiaDetalleAsync(id);
@@ -195,6 +201,37 @@ namespace Application.Services
         public async Task EliminarArchivoParrillaAsync(string rutaBase)
         {
             await _repository.EliminarArchivoParrillaAsync(rutaBase);
+        }
+
+        // TABLA BONIFICACIONES
+
+        public async Task<int> GuardarTablaBonificacionesAsync(CrearTablaBonificacionesDTO dto, string rutaBase)
+        {
+            return await _repository.GuardarTablaBonificacionesAsync(dto, rutaBase);
+        }
+
+        public async Task<TablaBonificacionesDTO?> ObtenerTablaBonificacionesAsync()
+        {
+            var entidad = await _repository.ObtenerTablaBonificacionesAsync();
+
+            if (entidad == null)
+                return null;
+
+            return new TablaBonificacionesDTO
+            {
+                Id = entidad.Id,
+                Nombre = entidad.Nombre,
+                Descripcion = entidad.Descripcion,
+                NombreArchivo = entidad.NombreArchivo,
+                ExtensionArchivo = entidad.ExtensionArchivo,
+                UrlArchivo = entidad.UrlArchivo,
+                FechaModificado = entidad.FechaModificado
+            };
+        }
+
+        public async Task EliminarArchivoTablaBonificacionesAsync(string rutaBase)
+        {
+            await _repository.EliminarArchivoTablaBonificacionesAsync(rutaBase);
         }
 
     }

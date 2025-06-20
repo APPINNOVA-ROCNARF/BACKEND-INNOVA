@@ -11,5 +11,10 @@ namespace Application.Audit
     {
         Task AgregarAsync(AuditoriaBase auditoria, string modulo);
         Task<IList<HistorialAuditoriaDTO>> ObtenerHistorialAsync(string entidad, int entidadId);
+        Task<Dictionary<int, bool>> FacturasVistas(
+                    string entidad,
+                    List<int> entidadIds,
+                    int usuarioId,
+                    string tipoEvento);
     }
 }

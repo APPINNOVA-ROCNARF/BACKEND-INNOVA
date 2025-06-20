@@ -26,25 +26,32 @@ namespace Application.EventHandlers.Auditoria
 
         public async Task Handle(EstadoViaticoCambiadoEvent domainEvent)
         {
-            var datos = new
+            try
             {
-                ViaticoId = domainEvent.ViaticoId,
-                Campo = domainEvent.Campo,
-                ValorAnterior = domainEvent.ValorAnterior.ToString(),
-                ValorNuevo = domainEvent.ValorNuevo.ToString(),
-                FechaEvento = domainEvent.FechaEvento
-            };
+                var datos = new
+                {
+                    ViaticoId = domainEvent.ViaticoId,
+                    Campo = domainEvent.Campo,
+                    ValorAnterior = domainEvent.ValorAnterior.ToString(),
+                    ValorNuevo = domainEvent.ValorNuevo.ToString(),
+                    FechaEvento = domainEvent.FechaEvento
+                };
 
-            await _auditoriaService.RegistrarEventoAsync(new AuditoriaEventoDTO
+                await _auditoriaService.RegistrarEventoAsync(new AuditoriaEventoDTO
+                {
+                    Modulo = ModulosAuditoria.Viaticos,
+                    TipoEvento = "CambioEstadoViatico",
+                    Datos = datos,
+                    Entidad = "Viatico",
+                    EntidadId = domainEvent.ViaticoId
+                });
+
+                _logger.LogInformation("Auditoría registrada para cambio de estado del viático {Id}", domainEvent.ViaticoId);
+            }
+            catch (Exception ex)
             {
-                Modulo = ModulosAuditoria.Viaticos,
-                TipoEvento = "CambioEstadoViatico",
-                Datos = datos,
-                Entidad = "Viatico",
-                EntidadId = domainEvent.ViaticoId
-            });
-
-            _logger.LogInformation("Auditoría registrada para cambio de estado del viático {Id}", domainEvent.ViaticoId);
+                _logger.LogWarning(ex, "No se pudo registrar evento de auditoría para cambio de estado del viático {Id}", domainEvent.ViaticoId);
+            }
         }
     }
 }

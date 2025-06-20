@@ -46,8 +46,9 @@ builder.Services.AddDbContext<SistemaDbContext>(options =>
 builder.Services.AddDbContext<ViaticosDbContext>(options =>
     options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information));
 
-builder.Services.AddDbContext<AuditoriaDbContext>(options =>
+builder.Services.AddDbContextFactory<AuditoriaDbContext>(options =>
     options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information));
+
 
 // Configurar el Rate Limiter
 builder.Services.AddRateLimiter(options =>
@@ -151,7 +152,7 @@ builder.Services.AddScoped<IDomainEventDispatcher, InMemoryDomainEventDispatcher
 builder.Services.AddScoped<IDomainEventHandler<EstadoViaticoCambiadoEvent>, EstadoViaticoCambiadoAuditoriaHandler>();
 builder.Services.AddScoped<IDomainEventHandler<FacturaEditadaEvent>, FacturaEditadaAuditoriaHandler>();
 builder.Services.AddScoped<IDomainEventHandler<ViaticoCreadoEvent>, ViaticoCreadoAuditoriaHandler>();
-
+builder.Services.AddScoped<IDomainEventHandler<ArchivoAccedidoEvent>, ArchivoAccedidoAuditoriaHandler>();
 
 
 //Unit of Work

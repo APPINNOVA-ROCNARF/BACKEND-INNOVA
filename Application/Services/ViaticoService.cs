@@ -1,6 +1,8 @@
-﻿using Application.Audit;
+﻿using System.Runtime.CompilerServices;
+using Application.Audit;
 using Application.DTO.ArchivoDTO;
 using Application.DTO.ViaticoDTO;
+using Application.DTO.ViaticoDTO.mobile;
 using Application.Enums.Viatico;
 using Application.Exceptions;
 using Application.Interfaces.IArchivo;
@@ -24,6 +26,7 @@ namespace Application.Services
         private readonly IAuditoriaRepository _auditoriaRepository;
         private readonly IUsuarioService _usuarioService;
         private readonly IDomainEventDispatcher _eventDispatcher;
+        private readonly IUsuarioActualService _usuarioActualService;
 
         public ViaticoService(
             IUnitOfWork unitOfWork,
@@ -33,7 +36,8 @@ namespace Application.Services
             IProveedorViaticoRepository proveedorRepository,
             IAuditoriaRepository auditoriaRepository,
             IUsuarioService usuarioService,
-            IDomainEventDispatcher eventDispatcher)
+            IDomainEventDispatcher eventDispatcher,
+            IUsuarioActualService usuarioActualService)
         {
             _unitOfWork = unitOfWork;
             _viaticoRepository = viaticoRepository;
@@ -42,7 +46,8 @@ namespace Application.Services
             _proveedorRepository = proveedorRepository;
             _auditoriaRepository = auditoriaRepository;
             _usuarioService = usuarioService;
-            _eventDispatcher =eventDispatcher;
+            _eventDispatcher = eventDispatcher;
+            _usuarioActualService = usuarioActualService;
         }
 
         public async Task<int> CrearViaticoAsync(ViaticoCrearDTO dto, string rutaBase)
@@ -498,6 +503,30 @@ namespace Application.Services
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
             return stream.ToArray();
+        }
+
+        public async Task<Dictionary<int, bool>> ObtenerFacturasVistasAsync(List<int> facturaIds)
+        {
+            var usuarioId = _usuarioActualService.Obtener().Id;
+
+            return await _auditoriaRepository.FacturasVistas(
+                "Factura",
+                facturaIds,
+                usuarioId,
+                "ArchivoAccedido"
+            );
+        }
+
+        // APP MOVIL
+
+        public async Task<IEnumerable<AppViaticoListDTO>> ObtenerViaticosPorUsuarioApp(string nombreUsuario, int cicloId)
+        {
+            var usuarioId = await _usuarioService.ObtenerIdPorNombreUsuario(nombreUsuario);
+
+            var solicitud = await _solicitudRepository.ObtenerPorCicloUsuarioAsync(cicloId, usuarioId);
+
+            return await _viaticoRepository.ObtenerViaticosApp(solicitud.Id);
+
         }
     }
 
