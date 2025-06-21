@@ -5,6 +5,7 @@ using Domain.Common;
 using Domain.Events;
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,6 +75,36 @@ namespace Application.Services
                 Contenido = contenido,
                 Modo = modo ?? "ver"
             };
+        }
+
+        public async Task<List<ArchivoTemporalGuardadoDTO>> ProcesarArchivoZipAsync(ArchivoUploadDTO archivoDTO, string rutaBase)
+        {
+            if (archivoDTO == null || archivoDTO.Contenido == null || archivoDTO.Contenido.Length == 0)
+                throw new BusinessException("El archivo ZIP está vacío.");
+
+            var archivosDbf = new List<ArchivoUploadDTO>();
+
+            using var zipStream = new MemoryStream(archivoDTO.Contenido);
+            using var archive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+
+            foreach (var entry in archive.Entries)
+            {
+                if (entry.Length == 0 || !entry.FullName.EndsWith(".dbf", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                using var entryStream = entry.Open();
+                using var memoryStream = new MemoryStream();
+                await entryStream.CopyToAsync(memoryStream);
+
+                archivosDbf.Add(new ArchivoUploadDTO
+                {
+                    Nombre = Path.GetFileNameWithoutExtension(entry.FullName),
+                    Extension = Path.GetExtension(entry.FullName),
+                    Contenido = memoryStream.ToArray()
+                });
+            }
+
+            return await _archivoRepository.GuardarArchivosTempAsync(archivosDbf, rutaBase);
         }
     }
 

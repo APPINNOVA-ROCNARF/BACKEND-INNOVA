@@ -67,6 +67,7 @@ namespace Infrastructure.Repositories
             return archivosGuardados;
         }
 
+        // MOVER ARCHIVOS VIATICOS A CARPETA FINAL
         public async Task<string> MoverArchivoFinalAsync(MoverArchivoDTO dto, string rutaBase)
         {
             var rutaTemporalCompleta = Path.Combine(rutaBase, dto.RutaRelativaTemporal);
@@ -94,6 +95,8 @@ namespace Infrastructure.Repositories
 
             return  rutaRelativaFinal;
         }
+
+        // MOVER ARCHIVOS GUIAS DE PRODUCTO A CARPETA FINAL
 
         public async Task<List<string>> MoverArchivosAGuiaProductoAsync(List<MoverArchivoGuiaDTO> archivos, int guiaProductoId, string rutaBase)
         {
@@ -127,6 +130,7 @@ namespace Infrastructure.Repositories
             return rutasFinales;
         }
 
+        // MOVER ARCHIVOS PARRILLA PROMOCIONAL A SU CARPETA FINAL
         public async Task<string> MoverArchivosParrillaPromocionalAsync(MoverArchivoGuiaDTO archivo, int parrillaPromocionalId, string rutaBase)
         {
             var rutaTemporalCompleta = Path.Combine(rutaBase, archivo.RutaTemporal);
@@ -152,6 +156,8 @@ namespace Infrastructure.Repositories
             return rutaRelativaFinal;
         }
 
+
+        // MOVER ARCHIVOS TABLA BONIFICACIONES A CARPETA FINAL
         public async Task<string> MoverArchivosTablaBonificacionesAsync(MoverArchivoGuiaDTO archivo, int tablaBonificacionesId, string rutaBase)
         {
             var rutaTemporalCompleta = Path.Combine(rutaBase, archivo.RutaTemporal);

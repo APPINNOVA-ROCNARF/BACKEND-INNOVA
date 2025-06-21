@@ -22,22 +22,6 @@ namespace BackendAPI.Controllers.Archivos
             _env = env;
         }
 
-        [HttpPost("upload")]
-        public async Task<IActionResult> SubirTemporal([FromBody] ArchivoUploadDTO archivoDto)
-        {
-            if (archivoDto == null || archivoDto.Contenido == null || archivoDto.Contenido.Length == 0)
-                return BadRequest("Archivo no válido.");
-
-            try
-            {
-                var rutaRelativa = await _archivoService.SubirArchivoTempAsync(archivoDto, _env.WebRootPath);
-                return Ok(new { rutaRelativa });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
 
         [HttpPost("upload-temp")]
         public async Task<IActionResult> UploadTemp([FromForm] ArchivoFormDTO form)
@@ -71,27 +55,32 @@ namespace BackendAPI.Controllers.Archivos
             return Ok(resultado);
         }
 
-        /*[HttpGet("descargar")]
-        public IActionResult DescargarArchivo(
-            [FromQuery] string rutaRelativa,
-            [FromQuery] string? modo = "ver",
-            [FromQuery] string? modulo = "general")
+        [HttpPost("upload-zip")]
+        public async Task<IActionResult> ProcesarZip([FromForm] ArchivoFormDTO form)
         {
-            try
+            var file = form.File;
+
+            if (file == null || file.Length == 0)
+                return BadRequest("Archivo ZIP no válido.");
+
+            if (!Path.GetExtension(file.FileName).Equals(".zip", StringComparison.OrdinalIgnoreCase))
+                return BadRequest("El archivo debe tener extensión .zip.");
+
+            using var ms = new MemoryStream();
+            await file.CopyToAsync(ms);
+
+            var archivoZipDto = new ArchivoUploadDTO
             {
-                var archivo = _archivoService.ObtenerArchivo(rutaRelativa, _env.ContentRootPath, modo, modulo);
-                var disposition = archivo.Modo.ToLowerInvariant() == "descargar" ? "attachment" : "inline";
-                return File(archivo.Contenido, archivo.Mime, disposition == "attachment" ? archivo.Nombre : null);
-            }
-            catch (BusinessException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (FileNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+                Nombre = Path.GetFileNameWithoutExtension(file.FileName),
+                Extension = Path.GetExtension(file.FileName),
+                Contenido = ms.ToArray()
+            };
+
+            var rutaBase = Path.Combine(_env.ContentRootPath, "Storage");
+            var archivosDbf = await _archivoService.ProcesarArchivoZipAsync(archivoZipDto, rutaBase);
+
+            return Ok(archivosDbf);
         }
-        */
+
     }
 }

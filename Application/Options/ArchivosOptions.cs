@@ -9,7 +9,7 @@ namespace Application.Options
     public class ArchivosOptions
     {
         public string RutaBase { get; set; } = "uploads";
-        public int MaximoMB { get; set; } = 5;
+        public int MaximoMB { get; set; } = 10;
         public List<string> ExtensionesPermitidas { get; set; } = new();
     }
 }
